@@ -14,17 +14,20 @@ import { errorHandler } from './middleware/errorHandler.js';
 
 dotenv.config();
 
-// ── Cached MongoDB connection (serverless-friendly) ──
-let cached = global._mongoose;
-if (!cached) cached = global._mongoose = { conn: null, promise: null };
+// ── Cached MongoDB connection (module-level, serverless-friendly) ──
+let _conn = null;
+let _promise = null;
 
 export async function connectDB() {
-  if (cached.conn) return cached.conn;
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(process.env.MONGO_URI, { bufferCommands: false }).then(m => m);
+  if (_conn && mongoose.connection.readyState === 1) return _conn;
+  if (!_promise) {
+    _promise = mongoose.connect(process.env.MONGO_URI, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 8000,
+    });
   }
-  cached.conn = await cached.promise;
-  return cached.conn;
+  _conn = await _promise;
+  return _conn;
 }
 
 // ── Express app ──
