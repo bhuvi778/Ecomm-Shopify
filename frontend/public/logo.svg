@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 220 64" fill="none">
+  <defs>
+    <linearGradient id="gmbg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#6d28d9"/>
+      <stop offset="100%" stop-color="#a855f7"/>
+    </linearGradient>
+    <linearGradient id="gmtop" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="rgba(255,255,255,0.28)"/>
+      <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
+    </linearGradient>
+    <filter id="gmshadow" x="-10%" y="-10%" width="120%" height="130%">
+      <feDropShadow dx="0" dy="3" stdDeviation="4" flood-color="#6d28d9" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+
+  <!-- Icon mark: rounded square -->
+  <rect x="2" y="2" width="60" height="60" rx="15" fill="url(#gmbg)" filter="url(#gmshadow)"/>
+  <!-- Gloss shine -->
+  <rect x="2" y="2" width="60" height="34" rx="15" fill="url(#gmtop)"/>
+
+  <!-- Shopping bag handle -->
+  <path d="M17 31 C17 17 47 17 47 31" stroke="white" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+  <!-- Shopping bag body -->
+  <rect x="11" y="30" width="42" height="27" rx="6" fill="white"/>
+  <!-- Handle hole punch -->
+  <circle cx="32" cy="31" r="3.5" fill="url(#gmbg)"/>
+  <!-- GM text inside bag -->
+  <text x="32" y="51" text-anchor="middle"
+    font-family="'Arial Black',Arial,sans-serif"
+    font-weight="900" font-size="14" fill="#6d28d9">GM</text>
+
+  <!-- Wordmark: GM -->
+  <text x="78" y="30"
+    font-family="'Arial Black',Arial,sans-serif"
+    font-weight="900" font-size="24" fill="#6d28d9">GM</text>
+  <!-- Wordmark: MART -->
+  <text x="79" y="54"
+    font-family="Arial,sans-serif"
+    font-weight="700" font-size="17" fill="#111827" letter-spacing="5">MART</text>
+</svg>

@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; }
+  body {
+    @apply bg-white text-gray-900 font-sans;
+    overflow-x: hidden;
+  }
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-gray-100; }
+  ::-webkit-scrollbar-thumb { @apply bg-brand-400 rounded-full; }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+    bg-gradient-to-r from-brand-700 to-brand-500 text-white font-semibold rounded-xl
+    hover:from-brand-800 hover:to-brand-600 active:scale-95 transition-all duration-200
+    shadow-lg shadow-brand-200;
+  }
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2 px-6 py-3
+    border-2 border-brand-600 text-brand-600 font-semibold rounded-xl
+    hover:bg-brand-50 active:scale-95 transition-all duration-200;
+  }
+  .card {
+    @apply bg-white border border-gray-100 shadow-sm rounded-2xl;
+  }
+  .input {
+    @apply w-full bg-gray-50 border border-gray-200 text-gray-900 placeholder-gray-400 rounded-xl px-4 py-3
+    focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-100 transition;
+  }
+  .badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+  }
+  .section-title {
+    @apply font-display text-3xl md:text-4xl font-bold text-gray-900;
+  }
+  .gradient-text {
+    @apply bg-gradient-to-r from-brand-600 via-purple-500 to-pink-500 bg-clip-text text-transparent;
+  }
+}
+
+/* Glass card */
+.glass {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* Marquee scroll */
+@keyframes marquee-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee-scroll 28s linear infinite;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Floating badge bob */
+@keyframes floatY {
+  0%,100% { transform: translateY(0px); }
+  50%     { transform: translateY(-10px); }
+}
+
+/* Shine on hover */
+.shine-hover {
+  position: relative;
+  overflow: hidden;
+}
+.shine-hover::after {
+  content: '';
+  position: absolute; top: 0; left: -100%;
+  width: 60%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+  transition: left 0.5s ease;
+}
+.shine-hover:hover::after { left: 150%; }
