@@ -1,5 +1,13 @@
 ﻿import React from 'react';
+
+// feTurbulence SVG filters are extremely expensive on mobile Safari (OOM crash).
+// Skip entirely on touch/mobile devices.
+const isMobileDevice =
+  typeof window !== "undefined" &&
+  (window.innerWidth < 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+
 export default function NoiseOverlay() {
+  if (isMobileDevice) return null;
   return (
     <div
       aria-hidden="true"

@@ -686,6 +686,19 @@ export default function Home() {
           box-shadow: 0 4px 18px rgba(0,0,0,.45);
           min-width: 70px;
         }
+
+        /* ── MOBILE — kill every backdrop-filter and animation that uses GPU layers ── */
+        @media (max-width: 767px) {
+          .glass-hero, .countdown-box, .stat-card {
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            background: rgba(0,0,0,0.72) !important;
+          }
+          .aurora-blob { display: none !important; }
+          .tw-star     { display: none !important; }
+          .ring-cw, .ring-ccw { display: none !important; }
+          .ticker-wrap::before, .ticker-wrap::after { display: none; }
+        }
         .stat-card:hover {
           transform: translateY(-4px) scale(1.05);
           box-shadow: 0 10px 32px rgba(0,0,0,.6);
@@ -712,7 +725,7 @@ export default function Home() {
         }
       `}</style>
 
-      <div className="flex h-screen w-full overflow-hidden">
+      <div className="flex w-full overflow-hidden" style={{ height:"100svh", minHeight:"-webkit-fill-available" }}>
 
         {/* ══════════════════════════════════════════════
             LEFT — CATEGORY SIDEBAR
@@ -900,8 +913,8 @@ export default function Home() {
             <div className="canvas-vignette absolute inset-0" />
           </div>
 
-          {/* Aurora blobs */}
-          {[
+          {/* Aurora blobs — desktop only; blur(75px)×7 OOM-crashes mobile Safari */}
+          {!isMobile && [
             { c:"rgba(124,58,237,.32)",  w:520, t:"-8%",  l:"-12%", adur:"16s", adelay:"0s"  },
             { c:"rgba(236,72,153,.26)",  w:440, t:"-5%",  r:"-10%", adur:"13s", adelay:"3s"  },
             { c:"rgba(6,182,212,.20)",   w:400, b:"-5%",  l:"8%",   adur:"19s", adelay:"6s"  },
@@ -922,8 +935,8 @@ export default function Home() {
             />
           ))}
 
-          {/* Stars */}
-          {Array.from({ length:34 }).map((_,i)=>(
+          {/* Stars — desktop only */}
+          {!isMobile && Array.from({ length:34 }).map((_,i)=>(
             <div key={i} className="tw-star absolute rounded-full bg-white pointer-events-none z-0"
               style={{
                 "--td": `${1.3+(i%7)*0.28}s`,
@@ -955,8 +968,8 @@ export default function Home() {
             </div>
           ))}
 
-          {/* Orbit rings centered on globe area */}
-          <div className="absolute pointer-events-none" style={{ top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:0, height:0, zIndex:11 }}>
+          {/* Orbit rings — desktop only */}
+          {!isMobile && <div className="absolute pointer-events-none" style={{ top:"50%", left:"50%", transform:"translate(-50%,-50%)", width:0, height:0, zIndex:11 }}>
             {[
               { size:420, sp:"20s", dir:"ring-cw",  dot:"#fbbf24", dotPos:"top-[-7px] left-1/2 -translate-x-1/2" },
               { size:310, sp:"11s", dir:"ring-ccw", dot:"#a78bfa", dotPos:"bottom-[-6px] left-1/2 -translate-x-1/2" },
@@ -975,7 +988,7 @@ export default function Home() {
                   style={{ background:r.dot, boxShadow:`0 0 12px ${r.dot}` }} />
               </div>
             ))}
-          </div>
+          </div>}
 
           {/* Corner ribbon badges */}
           <motion.div
