@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, Navigate } from 'react-router-dom';
-import { Package, Wallet, Users, TrendingUp, ShoppingBag, Gift, ArrowRight, Crown, Zap, LayoutDashboard, LogOut, User, Copy, CheckCircle, ExternalLink, ShieldCheck } from 'lucide-react';
+import { Package, Wallet, Users, TrendingUp, ShoppingBag, Gift, ArrowRight, Crown, Zap, LayoutDashboard, LogOut, User, Copy, CheckCircle, ExternalLink, ShieldCheck, Menu, X } from 'lucide-react';
 import useAuthStore from '../store/authStore.js';
 import api from '../api/axios.js';
 import toast from 'react-hot-toast';
@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [expandedOrder, setExpandedOrder] = useState(null);
   const [withdraw, setWithdraw]     = useState({ points:'', method:'upi', upiId:'', bankName:'', accountNumber:'', ifsc:'' });
   const [wSubmitting, setWSubmitting] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
     Promise.all([
@@ -115,14 +116,36 @@ export default function Dashboard() {
         .ud-sect-hdr h2 { font-size:20px; font-weight:900; color:#fff; margin:0; }
         @keyframes shimmer { 0%{background-position:-200% 0;}100%{background-position:200% 0;} }
         .ud-skel { border-radius:12px; background:linear-gradient(90deg,rgba(167,139,250,.07) 25%,rgba(167,139,250,.14) 50%,rgba(167,139,250,.07) 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; }
-        @media (max-width: 860px) { .ud-sidebar { width:64px; } .ud-side-item span:not(.badge) { display:none; } .ud-stats-grid { grid-template-columns:1fr 1fr !important; } .ud-two-col { grid-template-columns:1fr !important; } }
+        .ud-hamburger { display:none; width:36px; height:36px; border-radius:10px; background:rgba(255,255,255,.04); border:1.5px solid rgba(167,139,250,.2); align-items:center; justify-content:center; color:rgba(196,181,253,.7); cursor:pointer; flex-shrink:0; transition:all .18s; }
+        .ud-hamburger:hover { background:rgba(124,58,237,.15); border-color:rgba(167,139,250,.4); color:#c4b5fd; }
+        .ud-mob-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); z-index:199; }
+        .ud-mob-overlay.vis { display:block; }
+        @media (max-width: 860px) {
+          .ud-sidebar { position:fixed !important; left:-260px; z-index:200; transition:left .3s ease; height:100vh !important; top:0; width:240px !important; }
+          .ud-sidebar.open { left:0 !important; box-shadow:4px 0 40px rgba(0,0,0,.85); }
+          .ud-hamburger { display:flex !important; }
+          .ud-stats-grid { grid-template-columns:1fr 1fr !important; }
+          .ud-two-col { grid-template-columns:1fr !important; }
+          .ud-topbar { padding:12px 16px !important; }
+          .ud-content { width:100% !important; }
+          .ud-order-detail { grid-template-columns:1fr !important; }
+          .ud-ref-grid { grid-template-columns:repeat(3,1fr) !important; }
+          .ud-main-pad { padding:18px 16px 50px !important; }
+        }
+        @media (max-width: 480px) {
+          .ud-stats-grid { grid-template-columns:1fr !important; }
+          .ud-topbar { padding:10px 12px !important; }
+          .ud-topbar-become-agent { display:none !important; }
+          .ud-ref-grid { grid-template-columns:repeat(2,1fr) !important; }
+        }
       `}</style>
 
       <div className="ud-page">
         <div className="ud-grid" />
+        <div className={`ud-mob-overlay${sidebarOpen ? ' vis' : ''}`} onClick={() => setSidebarOpen(false)} />
 
         {/* SIDEBAR */}
-        <aside className="ud-sidebar">
+        <aside className={`ud-sidebar${sidebarOpen ? ' open' : ''}`}>
           <div style={{ padding:'24px 20px 18px', borderBottom:'1px solid rgba(167,139,250,.1)' }}>
             <div style={{ display:'flex', alignItems:'baseline', gap:8, marginBottom:8 }}>
               <span style={{ fontWeight:900, fontSize:21, background:'linear-gradient(135deg,#fffde7,#fbbf24,#f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>GMT</span>
@@ -135,7 +158,7 @@ export default function Dashboard() {
 
           <nav style={{ padding:'10px 0', flex:1 }}>
             {SIDEBAR_ITEMS.map(item => (
-              <button key={item.id} onClick={() => setSection(item.id)} className={`ud-side-item${section===item.id?' active':''}`}>
+              <button key={item.id} onClick={() => { setSection(item.id); setSidebarOpen(false); }} className={`ud-side-item${section===item.id?' active':''}`}>
                 <item.icon style={{ width:16, height:16, flexShrink:0 }} />
                 <span style={{ flex:1 }}>{item.label}</span>
                 {item.badge != null && <span className="badge" style={{ padding:'2px 7px', borderRadius:99, background:'rgba(167,139,250,.18)', color:'#c4b5fd', fontSize:11, fontWeight:800 }}>{item.badge}</span>}
@@ -170,6 +193,9 @@ export default function Dashboard() {
         <div className="ud-content">
           {/* Top bar */}
           <div className="ud-topbar">
+            <button className="ud-hamburger" onClick={() => setSidebarOpen(o => !o)} aria-label="Menu">
+              {sidebarOpen ? <X style={{ width:18, height:18 }} /> : <Menu style={{ width:18, height:18 }} />}
+            </button>
             <div>
               <h1 style={{ fontSize:'clamp(1.05rem,2vw,1.25rem)', fontWeight:900, color:'#fff', margin:'0 0 2px' }}>
                 Hi, <span style={{ background:'linear-gradient(135deg,#fde68a,#fbbf24,#f97316)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>{user?.name?.split(' ')[0]}</span> 👋
@@ -177,7 +203,7 @@ export default function Dashboard() {
               <p style={{ color:'rgba(196,181,253,.5)', fontSize:12, margin:0 }}>Welcome back to your dashboard</p>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-              <Link to="/agent/register" style={{ padding:'8px 14px', borderRadius:11, background:'rgba(251,191,36,.1)', border:'1px solid rgba(251,191,36,.3)', color:'#fbbf24', textDecoration:'none', fontWeight:700, fontSize:12, display:'flex', alignItems:'center', gap:5 }}>
+              <Link to="/agent/register" className="ud-topbar-become-agent" style={{ padding:'8px 14px', borderRadius:11, background:'rgba(251,191,36,.1)', border:'1px solid rgba(251,191,36,.3)', color:'#fbbf24', textDecoration:'none', fontWeight:700, fontSize:12, display:'flex', alignItems:'center', gap:5 }}>
                 <Crown style={{ width:13, height:13 }} /> Become Agent
               </Link>
               <div style={{ width:34, height:34, borderRadius:99, background:'linear-gradient(135deg,rgba(124,58,237,.3),rgba(167,139,250,.18))', border:'1.5px solid rgba(167,139,250,.3)', display:'flex', alignItems:'center', justifyContent:'center', color:'#c4b5fd', fontWeight:900, fontSize:13 }}>
@@ -186,7 +212,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div style={{ padding:'28px 28px 60px', position:'relative', zIndex:1 }}>
+          <div className="ud-main-pad" style={{ padding:'28px 28px 60px', position:'relative', zIndex:1 }}>
 
             {/* OVERVIEW */}
             {section === 'overview' && (
@@ -320,7 +346,7 @@ export default function Dashboard() {
                               {expandedOrder === o._id && (
                                 <tr style={{ background:'rgba(124,58,237,.04)' }}>
                                   <td colSpan={6} style={{ padding:'18px 22px' }}>
-                                    <div style={{ display:'grid', gridTemplateColumns:'1.5fr 1fr', gap:20 }}>
+                                    <div className="ud-order-detail" style={{ display:'grid', gridTemplateColumns:'1.5fr 1fr', gap:20 }}>
                                       <div>
                                         <h4 style={{ fontSize:12, fontWeight:800, color:'#c4b5fd', margin:'0 0 10px', textTransform:'uppercase', letterSpacing:'.08em' }}>Items ({o.items?.length || 0})</h4>
                                         <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -508,7 +534,7 @@ export default function Dashboard() {
                 <div className="ud-glass" style={{ padding:24, marginTop:18 }}>
                   <h3 style={{ fontSize:14, fontWeight:800, color:'#c4b5fd', margin:'0 0 16px' }}>My Network</h3>
                   {referralNetwork && Array.isArray(referralNetwork.levels) && referralNetwork.levels.length > 0 ? (
-                    <div style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:10 }}>
+                    <div className="ud-ref-grid" style={{ display:'grid', gridTemplateColumns:'repeat(5,1fr)', gap:10 }}>
                       {referralNetwork.levels.map((lvl, i) => (
                         <div key={i} style={{ padding:'14px 12px', borderRadius:14, background:'rgba(124,58,237,.08)', border:'1px solid rgba(167,139,250,.18)', textAlign:'center' }}>
                           <div style={{ fontSize:11, color:'rgba(167,139,250,.55)', fontWeight:700, textTransform:'uppercase', letterSpacing:'.06em', marginBottom:4 }}>Level {i+1}</div>
