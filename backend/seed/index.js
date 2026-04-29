@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { nanoid } from 'nanoid';
 
-dotenv.config({ path: '../.env' });
+dotenv.config(); // loads backend/.env (cwd = backend/ when running npm run seed)
 
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/maalkechalo';
 
