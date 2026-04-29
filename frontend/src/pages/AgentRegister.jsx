@@ -155,6 +155,11 @@ export default function AgentRegister() {
         .auth-link3:hover { color:#fbbf24; }
         @keyframes pulseQR { 0%,100%{box-shadow:0 0 0 4px rgba(251,191,36,.35),0 0 40px rgba(251,191,36,.25);} 50%{box-shadow:0 0 0 7px rgba(251,191,36,.55),0 0 64px rgba(251,191,36,.4);} }
         .qr-frame { background:#fff; border-radius:18px; padding:16px; display:inline-flex; align-items:center; justify-content:center; animation:pulseQR 2.5s ease-in-out infinite; }
+        @media (max-width:767px) {
+          .ar-step1-grid { grid-template-columns:1fr !important; }
+          .agent-bg { padding-left:12px !important; padding-right:12px !important; }
+          .agent-glass { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+        }
       `}</style>
       <div className="agent-bg">
         <div className="agent-grid" />
@@ -185,7 +190,7 @@ export default function AgentRegister() {
 
           {/* ── STEP 1: Benefits & Pricing ── */}
           {step === 1 && (
-            <div ref={cardRef} style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, opacity:0 }}>
+            <div ref={cardRef} className="ar-step1-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, opacity:0 }}>
 
               {/* Benefits grid */}
               <div>

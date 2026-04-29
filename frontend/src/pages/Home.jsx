@@ -203,6 +203,7 @@ export default function Home() {
   const [openSub, setOpenSub] = useState({});
   const [query,   setQuery]   = useState("");
   const [hoverCat,setHoverCat]= useState(null);
+  const [mobileCatOpen, setMobileCatOpen] = useState(false);
   const time = useCountdown(LAUNCH_DATE);
 
   /* GSAP refs */
@@ -222,17 +223,17 @@ export default function Home() {
   useEffect(() => {
     const tl = gsap.timeline();
 
-    /* Left sidebar slides in */
-    gsap.fromTo(asideRef.current,
-      { x: -80, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.9, ease: "expo.out" }
-    );
-
-    /* Stagger all category rows */
-    gsap.fromTo(".cat-row-item",
-      { x: -40, opacity: 0 },
-      { x: 0, opacity: 1, duration: 0.5, stagger: 0.045, ease: "power3.out", delay: 0.3 }
-    );
+    /* Left sidebar slides in — skip on mobile (sidebar is positioned off-screen) */
+    if (!isMobile) {
+      gsap.fromTo(asideRef.current,
+        { x: -80, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.9, ease: "expo.out" }
+      );
+      gsap.fromTo(".cat-row-item",
+        { x: -40, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.5, stagger: 0.045, ease: "power3.out", delay: 0.3 }
+      );
+    }
 
     /* Right hero sequence */
     tl.fromTo(badgeRef.current,
@@ -580,7 +581,37 @@ export default function Home() {
           right:0;
           background: linear-gradient(to left, rgba(5,0,16,1) 0%, transparent 100%);
         }
+
+        /* ── HOME MOBILE LAYOUT ── */
+        .mob-cat-btn { display:none; position:fixed; top:14px; left:14px; z-index:302; width:42px; height:42px; border-radius:13px; background:linear-gradient(135deg,rgba(124,58,237,.82),rgba(76,29,149,.75)); border:1.5px solid rgba(167,139,250,.5); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px); align-items:center; justify-content:center; color:#c4b5fd; cursor:pointer; box-shadow:0 4px 22px rgba(124,58,237,.6); transition:all .18s; }
+        .mob-cat-btn:hover { background:linear-gradient(135deg,rgba(124,58,237,.98),rgba(76,29,149,.95)); }
+        .mob-cat-overlay { display:none; position:fixed; inset:0; z-index:300; background:rgba(0,0,0,.65); }
+        .mob-cat-overlay.open { display:block; }
+        .mob-sidebar-close { display:none; }
+        @media (max-width:767px) {
+          .home-sidebar { position:fixed !important; left:-100% !important; top:0; height:100vh !important; height:100dvh !important; width:82vw !important; max-width:300px !important; min-width:0 !important; z-index:301; transition:left .28s cubic-bezier(.4,0,.2,1); }
+          .home-sidebar.mob-open { left:0 !important; box-shadow:6px 0 48px rgba(0,0,0,.9); }
+          .home-hero-section { overflow-y:auto !important; overflow-x:hidden !important; }
+          .hero-content-z { height:auto !important; min-height:100svh !important; justify-content:flex-start !important; padding-top:70px !important; padding-left:20px !important; padding-right:20px !important; padding-bottom:64px !important; }
+          .brand-flex-mob { gap:8px !important; }
+          .brand-font-mob { font-size:clamp(2.4rem,11vw,3.5rem) !important; }
+          .mob-cat-btn { display:flex !important; }
+          .mob-sidebar-close { display:flex !important; }
+          .float-sticker { display:none !important; }
+          .mob-hide-ribbon { display:none !important; }
+          .pill-item { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+          .stat-card { min-width:50px !important; }
+          .countdown-box { min-width:50px !important; padding:8px 6px !important; }
+          .countdown-colon { font-size:1.1rem !important; margin-bottom:8px !important; }
+        }
       `}</style>
+
+      {/* Mobile categories overlay */}
+      <div className={`mob-cat-overlay${mobileCatOpen ? " open" : ""}`} onClick={() => setMobileCatOpen(false)} />
+      {/* Floating categories button — mobile only */}
+      <button className="mob-cat-btn" onClick={() => setMobileCatOpen(true)} aria-label="Browse categories">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
 
       <div className="flex w-full overflow-hidden" style={{ height:"100svh", minHeight:"-webkit-fill-available" }}>
 
@@ -589,9 +620,13 @@ export default function Home() {
         ══════════════════════════════════════════════ */}
         <aside
           ref={asideRef}
-          className="sidebar-bg flex flex-col h-full z-10 shadow-2xl"
+          className={`sidebar-bg flex flex-col h-full z-10 shadow-2xl home-sidebar${mobileCatOpen ? " mob-open" : ""}`}
           style={{ width:"38%", minWidth:255, maxWidth:440 }}
         >
+          {/* Mobile close button */}
+          <div className="mob-sidebar-close" style={{ justifyContent:'flex-end', padding:'10px 12px 0', flexShrink:0 }}>
+            <button onClick={() => setMobileCatOpen(false)} style={{ padding:'5px 12px', borderRadius:9, background:'rgba(248,113,113,.1)', border:'1px solid rgba(248,113,113,.28)', color:'#f87171', fontSize:12, fontWeight:700, cursor:'pointer' }}>✕ Close</button>
+          </div>
           {/* Header */}
           <div className="cat-header-bg flex-shrink-0 px-4 pt-4 pb-3">
             <div className="flex items-center gap-2 mb-2.5">
@@ -744,7 +779,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════════
             RIGHT — PRE-LAUNCH HERO
         ══════════════════════════════════════════════ */}
-        <section ref={heroRef} className="flex-1 h-full relative overflow-hidden hero-bg">
+        <section ref={heroRef} className="flex-1 h-full relative overflow-hidden hero-bg home-hero-section">
 
           {/* Animated grid */}
           <div className="hero-grid absolute inset-0 pointer-events-none z-0" />
@@ -846,7 +881,7 @@ export default function Home() {
             initial={{ scale:0, rotate:20, opacity:0 }}
             animate={{ scale:1, rotate:12, opacity:1 }}
             transition={{ type:"spring", bounce:0.65, delay:1.0 }}
-            className="absolute top-4 right-5 z-30"
+            className="absolute top-4 right-5 z-30 mob-hide-ribbon"
           >
             <Card3D>
               <div className="text-yellow-950 text-[9px] font-black px-3 py-1.5 rounded-2xl uppercase tracking-widest border-2 border-yellow-300 cursor-default"
@@ -859,7 +894,7 @@ export default function Home() {
             initial={{ scale:0, rotate:-15, opacity:0 }}
             animate={{ scale:1, rotate:-8, opacity:1 }}
             transition={{ type:"spring", bounce:0.65, delay:1.2 }}
-            className="absolute top-4 left-4 z-30"
+            className="absolute top-4 left-4 z-30 mob-hide-ribbon"
           >
             <Card3D>
               <div className="text-green-950 text-[9px] font-black px-3 py-1.5 rounded-2xl uppercase tracking-widest border-2 border-green-300 cursor-default"
@@ -885,12 +920,12 @@ export default function Home() {
             </div>
 
             {/* Brand */}
-            <div ref={brandRef} style={{ opacity:0 }} className="mb-3 flex items-baseline gap-5">
-              <span className="brand-gmt font-black leading-none"
+            <div ref={brandRef} style={{ opacity:0, gap:20 }} className="mb-3 flex items-baseline brand-flex-mob">
+              <span className="brand-gmt font-black leading-none brand-font-mob"
                 style={{ fontSize:"clamp(3.5rem,8.5vw,6.2rem)", letterSpacing:"-0.03em" }}>
                 GMT
               </span>
-              <span className="brand-mart font-black leading-none"
+              <span className="brand-mart font-black leading-none brand-font-mob"
                 style={{ fontSize:"clamp(3.5rem,8.5vw,6.2rem)", letterSpacing:"-0.03em" }}>
                 MART
               </span>
