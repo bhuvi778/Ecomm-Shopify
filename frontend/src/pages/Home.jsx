@@ -327,9 +327,21 @@ function Card3D({ children, className = "", style = {} }) {
 }
 
 /* ─────────────────────────────────────────────────────────────────
+   ERROR BOUNDARY — prevents WebGL crash from killing the whole page
+───────────────────────────────────────────────────────────────── */
+class CanvasErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { hasError: false }; }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() { return this.state.hasError ? null : this.props.children; }
+}
+
+/* ─────────────────────────────────────────────────────────────────
    MAIN HOME COMPONENT
 ───────────────────────────────────────────────────────────────── */
 export default function Home() {
+  const isMobile = typeof window !== "undefined" &&
+    (window.innerWidth < 768 || /iPhone|iPad|iPod|Android/i.test(navigator.userAgent));
+
   const [openCat, setOpenCat] = useState(null);
   const [openSub, setOpenSub] = useState({});
   const [query,   setQuery]   = useState("");
@@ -871,11 +883,19 @@ export default function Home() {
           <div className="scan-line absolute left-0 right-0 h-[1.5px] pointer-events-none z-0"
             style={{ background:"linear-gradient(90deg,transparent,rgba(251,191,36,.45),rgba(251,191,36,.8),rgba(251,191,36,.45),transparent)" }} />
 
-          {/* THREE.JS CANVAS — full fill */}
+          {/* THREE.JS CANVAS — full fill (desktop only; skipped on mobile to prevent OOM crash) */}
           <div className="absolute inset-0 z-0 pointer-events-none">
-            <Canvas dpr={[1, 2]} camera={{ position:[0,0,3.5], fov:55 }}>
-              <Scene3D />
-            </Canvas>
+            {!isMobile && (
+              <CanvasErrorBoundary>
+                <Canvas
+                  dpr={[1, 1.5]}
+                  camera={{ position:[0,0,3.5], fov:55 }}
+                  gl={{ powerPreference:"low-power", antialias:false }}
+                >
+                  <Scene3D />
+                </Canvas>
+              </CanvasErrorBoundary>
+            )}
             {/* Vignette overlay */}
             <div className="canvas-vignette absolute inset-0" />
           </div>
