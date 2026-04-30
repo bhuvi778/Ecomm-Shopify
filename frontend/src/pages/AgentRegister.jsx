@@ -110,23 +110,36 @@ export default function AgentRegister() {
   };
 
   const goToPayment = () => {
-    if (!user) {
-      // Show registration form first
-      setStep(2);
-      animateStep2();
-    } else {
-      fetchQRAndGoToStep3();
+    // Always show form first; prefill from user if logged in
+    if (user) {
+      setRegForm(prev => ({
+        ...prev,
+        name:  prev.name  || user.name  || "",
+        email: prev.email || user.email || "",
+        phone: prev.phone || user.phone || "",
+        referralCode: prev.referralCode || user.referredBy || initialRef || "",
+      }));
     }
+    setStep(2);
+    animateStep2();
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (regForm.password.length < 6) return toast.error("Password must be at least 6 characters");
     setRegLoading(true);
     try {
-      await register(regForm);
+      if (!user) {
+        if (regForm.password.length < 6) {
+          toast.error("Password must be at least 6 characters");
+          setRegLoading(false);
+          return;
+        }
+        await register(regForm);
+        toast.success("Account created! Now complete your payment.");
+      } else {
+        toast.success("Details confirmed. Proceed to payment.");
+      }
       setWentThroughForm(true);
-      toast.success("Account created! Now complete your payment.");
       await fetchQRAndGoToStep3();
     } catch (err) {
       toast.error(err.response?.data?.message || "Registration failed");
@@ -310,7 +323,7 @@ export default function AgentRegister() {
                   </button>
                   <div style={{ flex:1 }} />
                   <span style={{ display:"inline-flex", alignItems:"center", gap:6, padding:"5px 14px", borderRadius:99, fontSize:11, fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", background:"rgba(124,58,237,.15)", border:"1px solid rgba(124,58,237,.35)", color:"#c4b5fd" }}>
-                    Step 2 of 3 — Create Account
+                    Step 2 of 3 — {user ? "Confirm Details" : "Create Account"}
                   </span>
                 </div>
 
@@ -318,8 +331,8 @@ export default function AgentRegister() {
                   <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:54, height:54, borderRadius:16, background:"rgba(124,58,237,.15)", border:"1px solid rgba(124,58,237,.35)", marginBottom:14 }}>
                     <User style={{ width:26, height:26, color:"#a78bfa" }} />
                   </div>
-                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Create Your Account</h2>
-                  <p style={{ color:"rgba(196,181,253,.65)", fontSize:13, margin:0 }}>Fill in your details to create your agent account</p>
+                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>{user ? "Confirm Your Details" : "Create Your Account"}</h2>
+                  <p style={{ color:"rgba(196,181,253,.65)", fontSize:13, margin:0 }}>{user ? "Review your information before continuing to payment" : "Fill in your details to create your agent account"}</p>
                 </div>
 
                 <form onSubmit={handleFormSubmit} style={{ display:"flex", flexDirection:"column", gap:14 }}>
@@ -345,35 +358,39 @@ export default function AgentRegister() {
                       </div>
                     </div>
                   ))}
-                  <div>
-                    <label style={{ display:"block", fontSize:11, fontWeight:700, color:"rgba(196,181,253,.8)", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.08em" }}>Password</label>
-                    <div style={{ position:"relative" }}>
-                      <Lock style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", width:15, height:15, color:"rgba(167,139,250,.5)", pointerEvents:"none" }} />
-                      <input
-                        type={showRegPw ? "text" : "password"}
-                        className="txn-input"
-                        style={{ paddingLeft:40, paddingRight:42 }}
-                        placeholder="Min 6 characters"
-                        value={regForm.password}
-                        onChange={e => setRegForm(prev => ({ ...prev, password: e.target.value }))}
-                        required
-                      />
-                      <button type="button" onClick={() => setShowRegPw(p => !p)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:"rgba(167,139,250,.5)", padding:0, display:"flex" }}>
-                        {showRegPw ? <EyeOff style={{ width:15, height:15 }} /> : <Eye style={{ width:15, height:15 }} />}
-                      </button>
+                  {!user && (
+                    <div>
+                      <label style={{ display:"block", fontSize:11, fontWeight:700, color:"rgba(196,181,253,.8)", marginBottom:5, textTransform:"uppercase", letterSpacing:"0.08em" }}>Password</label>
+                      <div style={{ position:"relative" }}>
+                        <Lock style={{ position:"absolute", left:12, top:"50%", transform:"translateY(-50%)", width:15, height:15, color:"rgba(167,139,250,.5)", pointerEvents:"none" }} />
+                        <input
+                          type={showRegPw ? "text" : "password"}
+                          className="txn-input"
+                          style={{ paddingLeft:40, paddingRight:42 }}
+                          placeholder="Min 6 characters"
+                          value={regForm.password}
+                          onChange={e => setRegForm(prev => ({ ...prev, password: e.target.value }))}
+                          required
+                        />
+                        <button type="button" onClick={() => setShowRegPw(p => !p)} style={{ position:"absolute", right:12, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", cursor:"pointer", color:"rgba(167,139,250,.5)", padding:0, display:"flex" }}>
+                          {showRegPw ? <EyeOff style={{ width:15, height:15 }} /> : <Eye style={{ width:15, height:15 }} />}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
 
                   <button type="submit" disabled={regLoading} className="btn-agent-main" style={{ marginTop:6 }}>
-                    {regLoading ? "Creating Account…" : "Continue to Payment"}
+                    {regLoading ? (user ? "Loading…" : "Creating Account…") : "Continue to Payment"}
                     {!regLoading && <ArrowRight style={{ width:19, height:19 }} />}
                   </button>
                 </form>
 
-                <p style={{ textAlign:"center", marginTop:14, fontSize:12, color:"rgba(167,139,250,.5)" }}>
-                  Already have an account?{" "}
-                  <button onClick={() => { navigate("/login?redirect=/agent/register"); }} style={{ background:"none", border:"none", cursor:"pointer", color:"#a78bfa", fontWeight:700, fontSize:12, padding:0 }}>Sign In</button>
-                </p>
+                {!user && (
+                  <p style={{ textAlign:"center", marginTop:14, fontSize:12, color:"rgba(167,139,250,.5)" }}>
+                    Already have an account?{" "}
+                    <button onClick={() => { navigate("/login?redirect=/agent/register"); }} style={{ background:"none", border:"none", cursor:"pointer", color:"#a78bfa", fontWeight:700, fontSize:12, padding:0 }}>Sign In</button>
+                  </p>
+                )}
               </div>
             </div>
           )}
