@@ -150,13 +150,13 @@ const CATEGORIES = [
 
 const TICKER_ITEMS = [
   "🎁 Rs.1000 Welcome Voucher FREE",
-  "💸 100% Cashback over 50 Months",
+  "� Up to 100% Value Returned as Rewards",
   "🚚 Free Cash-on-Delivery",
-  "⭐ 10% Direct Referral Bonus",
-  "💼 Sales Agents Earn Rs.3000+/Month",
-  "👗 500+ Fashion Products",
+  "⭐ Referral Income across multiple levels",
+  "💼 Sales Agent can Earn More than Rs.50,000 Per Month",
+  "👗 2,50,000+ Products",
   "🔒 Secure & Guaranteed",
-  "📦 Premium Gujarat Quality",
+  "📦 Premium Quality",
 ];
 
 /* ─────────────────────────────────────────────────────────────────
@@ -999,19 +999,18 @@ export default function Home() {
             <p ref={descRef} style={{ opacity:0, color:"rgba(200,195,230,.78)" }}
               className="text-[13px] max-w-[360px] mb-6 leading-relaxed">
               India's first marketplace with{" "}
-              <strong style={{ color:"#c4b5fd", fontWeight:700 }}>100% cashback in 50 months</strong>,
-              <strong style={{ color:"#fcd34d", fontWeight:700 }}> ₹1000 voucher</strong>, free COD &amp; 5-level referral income.
+              <strong style={{ color:"#c4b5fd", fontWeight:700 }}>100% value returned as rewards over time</strong>
+              {" — "}
+              <strong style={{ color:"#34d399", fontWeight:700 }}>Monthly Reward Credits (Up to 2%)</strong>,
+              <strong style={{ color:"#fcd34d", fontWeight:700 }}> ₹1000 Welcome voucher</strong>, free COD &amp; referral income.
             </p>
 
             {/* Pills */}
             <div className="flex flex-wrap justify-center gap-2 max-w-[440px] mb-6">
               {[
-                { icon:"🎁", text:"Rs.1000 Voucher",  ac:"#fbbf24" },
-                { icon:"💰", text:"100% Cashback",    ac:"#34d399" },
-                { icon:"🚚", text:"Free COD",          ac:"#60a5fa" },
-                { icon:"⭐", text:"10% Referral",      ac:"#a78bfa" },
-                { icon:"📦", text:"500+ Products",    ac:"#f87171" },
-                { icon:"🔒", text:"100% Secure",      ac:"#22d3ee" },
+                { icon:"🎁", text:"Rs.1000 Welcome Voucher", ac:"#fbbf24" },
+                { icon:"💰", text:"Up to 100% Value Returned", ac:"#34d399" },
+                { icon:"📦", text:"2,50,000+ Products",        ac:"#f87171" },
               ].map((p,i)=>(
                 <div key={i} className="pill-item inline-flex items-center gap-1.5 text-[11.5px] font-bold px-3.5 py-1.5 rounded-full cursor-default"
                   style={{
@@ -1065,10 +1064,10 @@ export default function Home() {
             {/* Stats */}
             <div className="mt-5 grid grid-cols-4 gap-2 w-full max-w-[380px]">
               {[
-                { num:"500+", label:"Products",    color:"#fbbf24", icon:"📦", from:"rgba(251,191,36,.14)", bdr:"#fbbf2455" },
-                { num:"16+",  label:"Categories",  color:"#a78bfa", icon:"🗂️", from:"rgba(167,139,250,.14)", bdr:"#a78bfa55" },
-                { num:"50mo", label:"Cashback",    color:"#34d399", icon:"💰", from:"rgba(52,211,153,.14)",  bdr:"#34d39955" },
-                { num:"₹1K",  label:"Voucher",     color:"#f87171", icon:"🎁", from:"rgba(248,113,113,.14)",bdr:"#f8717155" },
+                { num:"2.5L+", label:"Products",   color:"#fbbf24", icon:"📦", from:"rgba(251,191,36,.14)", bdr:"#fbbf2455" },
+                { num:"16+",   label:"Categories", color:"#a78bfa", icon:"🗂️", from:"rgba(167,139,250,.14)", bdr:"#a78bfa55" },
+                { num:"100%",  label:"Rewards",    color:"#34d399", icon:"💰", from:"rgba(52,211,153,.14)",  bdr:"#34d39955" },
+                { num:"₹1K",   label:"Voucher",    color:"#f87171", icon:"🎁", from:"rgba(248,113,113,.14)",bdr:"#f8717155" },
               ].map(({ num, label, color, icon, from, bdr })=>(
                 <div key={label} className="stat-card stat-item rounded-2xl px-2 py-3 text-center flex flex-col items-center"
                   style={{

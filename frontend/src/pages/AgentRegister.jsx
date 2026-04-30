@@ -1,18 +1,18 @@
 ﻿import React, { useState, useEffect, useRef } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { CheckCircle, ArrowRight, Gift, TrendingUp, Users, Crown, BadgeDollarSign, Star, QrCode, Clipboard, ChevronLeft, AlertCircle, Eye, EyeOff, User, Mail, Phone, Lock } from "lucide-react";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { CheckCircle, ArrowRight, Gift, TrendingUp, Users, Crown, BadgeDollarSign, Star, QrCode, Clipboard, ChevronLeft, AlertCircle, Eye, EyeOff, User, Mail, Phone, Lock, MessageCircle } from "lucide-react";
 import useAuthStore from "../store/authStore.js";
 import api from "../api/axios.js";
 import toast from "react-hot-toast";
 import { gsap } from "gsap";
 
 const BENEFITS = [
-  { icon:Gift,              label:"Welcome Voucher",   value:"Rs.1000",       desc:"Credited on joining",                 color:"#fbbf24", bg:"rgba(251,191,36,.12)",  border:"rgba(251,191,36,.3)"  },
-  { icon:TrendingUp,        label:"Monthly Cashback",  value:"Rs.3000+",      desc:"10% back for 30 months",              color:"#34d399", bg:"rgba(52,211,153,.1)",   border:"rgba(52,211,153,.28)" },
-  { icon:Users,             label:"Referral Commission",value:"10%",          desc:"On every direct referral purchase",   color:"#a78bfa", bg:"rgba(167,139,250,.1)",  border:"rgba(167,139,250,.28)"},
-  { icon:Star,              label:"Global Pool Entry", value:"Exclusive",     desc:"Participate in pool matrix rewards",  color:"#f472b6", bg:"rgba(244,114,182,.1)",  border:"rgba(244,114,182,.28)"},
-  { icon:CheckCircle,       label:"Sales Training",    value:"Free",          desc:"2 weeks worth Rs.25,000 — included",  color:"#22d3ee", bg:"rgba(34,211,238,.1)",   border:"rgba(34,211,238,.28)" },
-  { icon:BadgeDollarSign,   label:"Agent Dashboard",   value:"Full Access",   desc:"Real-time earnings & referral tracker",color:"#fb923c",bg:"rgba(251,146,60,.1)",  border:"rgba(251,146,60,.28)" },
+  { icon:Gift,              label:"Welcome Voucher",   value:"Rs.1000",       desc:"Credited on joining",                                   color:"#fbbf24", bg:"rgba(251,191,36,.12)",  border:"rgba(251,191,36,.3)"  },
+  { icon:TrendingUp,        label:"Monthly Reward",    value:"Rs.100 × 40 mo", desc:"Total Rs.4,000 — offer only till pre-launching period", color:"#34d399", bg:"rgba(52,211,153,.1)",   border:"rgba(52,211,153,.28)" },
+  { icon:Users,             label:"Referral Income",   value:"Multi-level",   desc:"Earn on every referral purchase",                       color:"#a78bfa", bg:"rgba(167,139,250,.1)",  border:"rgba(167,139,250,.28)"},
+  { icon:Star,              label:"Global Pool Entry", value:"Exclusive",     desc:"Participate in pool matrix rewards",                    color:"#f472b6", bg:"rgba(244,114,182,.1)",  border:"rgba(244,114,182,.28)"},
+  { icon:CheckCircle,       label:"Sales Training",    value:"Free",          desc:"2 weeks worth Rs.25,000 — included",                    color:"#22d3ee", bg:"rgba(34,211,238,.1)",   border:"rgba(34,211,238,.28)" },
+  { icon:BadgeDollarSign,   label:"Agent Dashboard",   value:"Full Access",   desc:"Real-time earnings & referral tracker",                 color:"#fb923c", bg:"rgba(251,146,60,.1)",   border:"rgba(251,146,60,.28)" },
 ];
 
 export default function AgentRegister() {
@@ -21,9 +21,13 @@ export default function AgentRegister() {
   const [regLoading, setRegLoading] = useState(false);
   const [qrLoading, setQrLoading]   = useState(false);
   const [qrData, setQrData]         = useState(null);
-  const [qrLabel, setQrLabel]       = useState("JazzCash / EasyPaisa");
+  const [qrLabel, setQrLabel]       = useState("UPI / Bank Transfer");
+  const [whatsapp, setWhatsapp]     = useState("");
+  const [whatsappNote, setWhatsappNote] = useState("Send the payment screenshot to the WhatsApp number below along with your ID and registered phone number.");
   const [txnId, setTxnId]           = useState("");
-  const [regForm, setRegForm]       = useState({ name:"", email:"", phone:"", password:"", referralCode:"" });
+  const [searchParams]              = useSearchParams();
+  const initialRef                  = (searchParams.get("ref") || "").toUpperCase();
+  const [regForm, setRegForm]       = useState({ name:"", email:"", phone:"", password:"", referralCode: initialRef });
   const [showRegPw, setShowRegPw]   = useState(false);
   const [wentThroughForm, setWentThroughForm] = useState(false);
   const navigate = useNavigate();
@@ -80,7 +84,9 @@ export default function AgentRegister() {
     try {
       const { data } = await api.get("/admin/payment-qr");
       setQrData(data.qr);
-      setQrLabel(data.label || "JazzCash / EasyPaisa");
+      setQrLabel(data.label || "UPI / Bank Transfer");
+      setWhatsapp(data.whatsapp || "");
+      if (data.whatsappNote) setWhatsappNote(data.whatsappNote);
     } catch {
       // proceed even if QR not configured yet
     } finally {
@@ -218,22 +224,23 @@ export default function AgentRegister() {
                 <p style={{ color:"rgba(167,139,250,.75)", fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.12em", marginBottom:4 }}>Registration Details</p>
 
                 <div className="agent-glass" style={{ borderRadius:20, padding:"24px 24px 20px", textAlign:"center" }}>
-                  <div style={{ fontSize:14, color:"rgba(167,139,250,.6)", letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, marginBottom:4 }}>One-Time Fee</div>
-                  <div style={{ fontSize:48, fontWeight:900, color:"#fff", lineHeight:1, marginBottom:4, textShadow:"0 0 28px rgba(255,255,255,.2)" }}>Rs.999</div>
-                  <div style={{ fontSize:12, color:"rgba(196,181,253,.55)", marginBottom:20 }}>Includes 2-week training worth Rs.25,000</div>
+                  <div style={{ fontSize:14, color:"rgba(167,139,250,.6)", letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, marginBottom:4 }}>One Time Registration Fees</div>
+                  <div style={{ fontSize:42, fontWeight:900, color:"#fff", lineHeight:1.05, marginBottom:4, textShadow:"0 0 28px rgba(255,255,255,.2)" }}>Rs.999<span style={{ fontSize:18, color:"#fbbf24", marginLeft:6 }}>+ 18% GST</span></div>
+                  <div style={{ fontSize:12, color:"rgba(196,181,253,.55)", marginBottom:8 }}>Includes 2-week training worth Rs.25,000</div>
+                  <div style={{ fontSize:11, color:"#34d399", fontWeight:700, marginBottom:18, padding:"4px 10px", background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.22)", borderRadius:99, display:"inline-block" }}>Offer only till pre-launching period</div>
                   {[
-                    { label:"Registration Fee",     val:"Rs.999",    c:"rgba(200,195,230,.7)" },
-                    { label:"Welcome Voucher",       val:"Rs.1,000",  c:"#fbbf24" },
-                    { label:"Total Cashback (30mo)", val:"Rs.3,000",  c:"#34d399" },
+                    { label:"Registration Fees",                                  val:"Rs.999 + 18% GST", c:"rgba(200,195,230,.7)" },
+                    { label:"Welcome Voucher",                                    val:"Rs.1,000",         c:"#fbbf24" },
+                    { label:"Total Monthly Cash Reward Rs.100/mo × 40 Months",    val:"Rs.4,000",         c:"#34d399" },
                   ].map(r => (
-                    <div key={r.label} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 0", borderBottom:"1px solid rgba(255,255,255,.06)", fontSize:13 }}>
-                      <span style={{ color:"rgba(196,181,253,.6)" }}>{r.label}</span>
-                      <span style={{ color:r.c, fontWeight:700 }}>{r.val}</span>
+                    <div key={r.label} style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"7px 0", borderBottom:"1px solid rgba(255,255,255,.06)", fontSize:13, gap:10 }}>
+                      <span style={{ color:"rgba(196,181,253,.6)", textAlign:"left" }}>{r.label}</span>
+                      <span style={{ color:r.c, fontWeight:700, whiteSpace:"nowrap" }}>{r.val}</span>
                     </div>
                   ))}
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0 0", fontSize:14 }}>
-                    <span style={{ color:"rgba(196,181,253,.8)", fontWeight:700 }}>Net Return</span>
-                    <span style={{ color:"#34d399", fontWeight:900, fontSize:16, textShadow:"0 0 16px rgba(52,211,153,.6)" }}>+Rs.3,001 Profit!</span>
+                    <span style={{ color:"rgba(196,181,253,.8)", fontWeight:700 }}>Net Earning</span>
+                    <span style={{ color:"#34d399", fontWeight:900, fontSize:16, textShadow:"0 0 16px rgba(52,211,153,.6)" }}>Rs.4,000</span>
                   </div>
                 </div>
 
@@ -243,7 +250,7 @@ export default function AgentRegister() {
                 </button>
 
                 <div style={{ display:"flex", flexWrap:"wrap", gap:8 }}>
-                  {["Passive Income","Work From Home","No Target Pressure","5-Level Referral","Lifetime Benefits"].map(t => (
+                  {["Passive Income","Work From Home","No Target Pressure","Referral Income","Lifetime Benefits"].map(t => (
                     <span key={t} style={{ fontSize:11, fontWeight:600, padding:"5px 11px", borderRadius:99, background:"rgba(124,58,237,.14)", border:"1px solid rgba(124,58,237,.3)", color:"rgba(196,181,253,.8)" }}>{t}</span>
                   ))}
                 </div>
@@ -357,13 +364,13 @@ export default function AgentRegister() {
                   <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:54, height:54, borderRadius:16, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.3)", marginBottom:14 }}>
                     <QrCode style={{ width:26, height:26, color:"#fbbf24" }} />
                   </div>
-                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Scan & Pay Rs.999</h2>
+                  <h2 style={{ fontSize:22, fontWeight:900, color:"#fff", margin:"0 0 6px" }}>Scan & Pay Rs.999 + 18% GST</h2>
                   <p style={{ color:"rgba(196,181,253,.65)", fontSize:13, margin:0 }}>
-                    Scan using <strong style={{ color:"#fbbf24" }}>{qrLabel}</strong> and pay Rs.999
+                    Scan the QR code below using <strong style={{ color:"#fbbf24" }}>{qrLabel}</strong>
                   </p>
                 </div>
 
-                <div style={{ display:"flex", justifyContent:"center", marginBottom:24 }}>
+                <div style={{ display:"flex", justifyContent:"center", marginBottom:18 }}>
                   {qrData ? (
                     <div className="qr-frame">
                       <img src={qrData} alt="Payment QR Code" style={{ width:200, height:200, objectFit:"contain", display:"block" }} />
@@ -376,12 +383,34 @@ export default function AgentRegister() {
                   )}
                 </div>
 
+                {/* WhatsApp note + number */}
+                <div style={{ background:"rgba(37,211,102,.08)", border:"1px solid rgba(37,211,102,.3)", borderRadius:14, padding:"14px 16px", marginBottom:22, textAlign:"center" }}>
+                  <p style={{ color:"rgba(220,255,235,.85)", fontSize:12.5, margin:"0 0 10px", lineHeight:1.55 }}>
+                    {whatsappNote}
+                  </p>
+                  {whatsapp ? (
+                    <a
+                      href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:99, background:"linear-gradient(135deg,#25d366,#128c7e)", color:"#fff", fontWeight:800, fontSize:14, textDecoration:"none", boxShadow:"0 6px 20px rgba(37,211,102,.4)" }}
+                    >
+                      <MessageCircle style={{ width:16, height:16 }} />
+                      WhatsApp: {whatsapp}
+                    </a>
+                  ) : (
+                    <p style={{ color:"rgba(167,139,250,.5)", fontSize:12, margin:0, fontStyle:"italic" }}>
+                      WhatsApp number not configured yet — contact admin.
+                    </p>
+                  )}
+                </div>
+
                 <div style={{ background:"rgba(251,191,36,.06)", border:"1px solid rgba(251,191,36,.18)", borderRadius:14, padding:"12px 16px", marginBottom:22 }}>
                   <p style={{ color:"rgba(251,191,36,.8)", fontSize:12, fontWeight:700, margin:"0 0 6px" }}>How to pay:</p>
                   <ol style={{ color:"rgba(196,181,253,.7)", fontSize:12, margin:0, paddingLeft:18, lineHeight:1.8 }}>
-                    <li>Open JazzCash or EasyPaisa app</li>
-                    <li>Tap "Scan QR" and scan the code above</li>
-                    <li>Enter amount <strong style={{ color:"#fbbf24" }}>Rs.999</strong> and confirm</li>
+                    <li>Scan the QR code above with your payment app</li>
+                    <li>Enter amount <strong style={{ color:"#fbbf24" }}>Rs.999 + 18% GST</strong> and confirm</li>
+                    <li>Send the payment screenshot to the WhatsApp number above</li>
                     <li>Copy the <strong style={{ color:"#fbbf24" }}>Transaction ID</strong> from your receipt</li>
                     <li>Paste it below and click Complete Registration</li>
                   </ol>
@@ -395,7 +424,7 @@ export default function AgentRegister() {
                     <input
                       className="txn-input"
                       type="text"
-                      placeholder="e.g. JC2024XXXXXXXXXX"
+                      placeholder="e.g. UPI / Bank reference no."
                       value={txnId}
                       onChange={e => setTxnId(e.target.value)}
                     />

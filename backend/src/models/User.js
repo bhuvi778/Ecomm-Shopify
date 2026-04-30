@@ -29,7 +29,7 @@ const userSchema = new mongoose.Schema(
     agentRegisteredAt: { type: Date },
     agentFee: { type: Number, default: 0 }, // amount paid (999)
     agentPaymentTxnId: { type: String, default: null }, // payment transaction ID proof
-    agentCashbackMonths: { type: Number, default: 30 }, // pre-launch = 30
+    agentCashbackMonths: { type: Number, default: 40 }, // pre-launch offer = 40 months
     agentCashbackPaid: { type: Number, default: 0 }, // months paid so far
 
     // Monthly sales for global pool qualification

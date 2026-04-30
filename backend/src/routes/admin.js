@@ -80,21 +80,35 @@ router.post('/run-agent-cashbacks', protect, requireRole('admin'), async (_req, 
 router.get('/payment-qr', protect, async (_req, res, next) => {
   try {
     const s = await Settings.findOne({ key: 'paymentQR' });
-    res.json({ qr: s?.value?.qr || null, label: s?.value?.label || 'JazzCash / EasyPaisa' });
+    res.json({
+      qr: s?.value?.qr || null,
+      label: s?.value?.label || 'UPI / Bank Transfer',
+      whatsapp: s?.value?.whatsapp || '',
+      whatsappNote: s?.value?.whatsappNote || 'Send the payment screenshot to the WhatsApp number below along with your ID and registered phone number.',
+    });
   } catch (err) { next(err); }
 });
 
 // PUT /api/admin/payment-qr — admin only
 router.put('/payment-qr', protect, requireRole('admin'), async (req, res, next) => {
   try {
-    const { qr, label } = req.body;
-    if (!qr) return res.status(400).json({ message: 'QR image data required' });
+    const { qr, label, whatsapp, whatsappNote } = req.body;
+    const existing = await Settings.findOne({ key: 'paymentQR' });
+    const value = {
+      qr: qr || existing?.value?.qr || null,
+      label: label || existing?.value?.label || 'UPI / Bank Transfer',
+      whatsapp: typeof whatsapp === 'string' ? whatsapp : (existing?.value?.whatsapp || ''),
+      whatsappNote: typeof whatsappNote === 'string' && whatsappNote.length
+        ? whatsappNote
+        : (existing?.value?.whatsappNote || 'Send the payment screenshot to the WhatsApp number below along with your ID and registered phone number.'),
+    };
+    if (!value.qr) return res.status(400).json({ message: 'QR image data required' });
     await Settings.findOneAndUpdate(
       { key: 'paymentQR' },
-      { value: { qr, label: label || 'JazzCash / EasyPaisa' } },
+      { value },
       { upsert: true, new: true }
     );
-    res.json({ message: 'Payment QR updated successfully' });
+    res.json({ message: 'Payment settings updated successfully' });
   } catch (err) { next(err); }
 });
 

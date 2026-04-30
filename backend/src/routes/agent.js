@@ -25,7 +25,7 @@ router.post('/register', protect, async (req, res, next) => {
         agentRegisteredAt: new Date(),
         agentFee: 999,
         agentPaymentTxnId: txnId.trim(),
-        agentCashbackMonths: 30, // pre-launch = 30 months
+        agentCashbackMonths: 40, // pre-launch offer = 40 months × Rs.100 = Rs.4,000
         agentCashbackPaid: 0,
         $inc: { walletPoints: 1000 }, // welcome voucher for agent
         'welcomeVoucher.amount': 1000,

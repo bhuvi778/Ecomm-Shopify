@@ -118,7 +118,7 @@ export async function processAgentCashbacks() {
   });
 
   for (const agent of agents) {
-    const monthlyAmount = Math.floor(agent.agentFee * 0.10);
+    const monthlyAmount = Math.round(agent.agentFee * 0.10);
     await User.findByIdAndUpdate(agent._id, {
       $inc: { walletPoints: monthlyAmount, agentCashbackPaid: 1 },
     });
