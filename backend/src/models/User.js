@@ -32,6 +32,16 @@ const userSchema = new mongoose.Schema(
     agentCashbackMonths: { type: Number, default: 40 }, // pre-launch offer = 40 months
     agentCashbackPaid: { type: Number, default: 0 }, // months paid so far
 
+    // Agent approval workflow
+    agentApprovalStatus: {
+      type: String,
+      enum: ['none', 'pending', 'approved', 'rejected'],
+      default: 'none',
+    },
+    agentApprovedAt:      { type: Date,   default: null },
+    agentApprovedBy:      { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
+    agentRejectionReason: { type: String, default: null },
+
     // Monthly sales for global pool qualification
     currentMonthSales: { type: Number, default: 0 },
     inGlobalPool: { type: Boolean, default: false },

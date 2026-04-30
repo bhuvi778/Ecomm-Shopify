@@ -37,6 +37,19 @@ export default function AgentRegister() {
 
   useEffect(() => {
     if (user?.isAgent) { navigate("/agent"); return; }
+    if (user?.agentApprovalStatus === 'pending') {
+      // Already submitted — show pending screen and load WhatsApp config
+      (async () => {
+        try {
+          const { data } = await api.get("/admin/payment-qr");
+          setWhatsapp(data.whatsapp || "");
+          if (data.whatsappNote) setWhatsappNote(data.whatsappNote);
+          setQrLabel(data.label || "UPI / Bank Transfer");
+        } catch {}
+        setTxnId(user?.agentPaymentTxnId || "");
+        setStep(4);
+      })();
+    }
     gsap.fromTo(heroRef.current,
       { y: -30, opacity: 0 },
       { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" }
@@ -131,13 +144,33 @@ export default function AgentRegister() {
     try {
       await api.post("/agent/register", { txnId: txnId.trim() });
       await refreshUser();
-      toast.success("Welcome aboard, Sales Agent! 🎉");
-      navigate("/agent");
+      toast.success("Application submitted! Awaiting admin approval.");
+      setStep(4);
+      animateStep2();
     } catch (err) {
-      toast.error(err.response?.data?.message || "Registration failed");
+      toast.error(err.response?.data?.message || "Submission failed");
     } finally {
       setRegLoading(false);
     }
+  };
+
+  // Build WhatsApp deep-link with pre-filled message containing txn id + agent id
+  const buildWhatsappLink = () => {
+    if (!whatsapp) return null;
+    const num = whatsapp.replace(/[^0-9]/g, "");
+    const lines = [
+      "Hi GMT Mart Admin,",
+      "I have just submitted my Sales Agent registration. Please find my payment details below:",
+      "",
+      `Name: ${user?.name || ""}`,
+      `Registered Phone: ${user?.phone || ""}`,
+      `Email: ${user?.email || ""}`,
+      `Agent ID / Referral Code: ${user?.referralCode || ""}`,
+      `Transaction ID: ${txnId || "(will paste after entering)"}`,
+      "",
+      "Sharing the payment screenshot in this chat. Kindly approve my account.",
+    ];
+    return `https://wa.me/${num}?text=${encodeURIComponent(lines.join("\n"))}`;
   };
 
   return (
@@ -390,13 +423,13 @@ export default function AgentRegister() {
                   </p>
                   {whatsapp ? (
                     <a
-                      href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, "")}`}
+                      href={buildWhatsappLink()}
                       target="_blank"
                       rel="noreferrer"
-                      style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:99, background:"linear-gradient(135deg,#25d366,#128c7e)", color:"#fff", fontWeight:800, fontSize:14, textDecoration:"none", boxShadow:"0 6px 20px rgba(37,211,102,.4)" }}
+                      style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"10px 20px", borderRadius:99, background:"linear-gradient(135deg,#25d366,#128c7e)", color:"#fff", fontWeight:800, fontSize:14, textDecoration:"none", boxShadow:"0 6px 20px rgba(37,211,102,.45)" }}
                     >
                       <MessageCircle style={{ width:16, height:16 }} />
-                      WhatsApp: {whatsapp}
+                      Chat on WhatsApp: {whatsapp}
                     </a>
                   ) : (
                     <p style={{ color:"rgba(167,139,250,.5)", fontSize:12, margin:0, fontStyle:"italic" }}>
@@ -441,6 +474,63 @@ export default function AgentRegister() {
                 <p style={{ textAlign:"center", fontSize:12, color:"rgba(167,139,250,.4)", margin:0 }}>
                   Registration activates after payment verification by admin
                 </p>
+              </div>
+            </div>
+          )}
+
+          {/* ── STEP 4: Pending Approval ── */}
+          {step === 4 && (
+            <div ref={step2Ref} style={{ opacity:0 }}>
+              <div className="agent-glass" style={{ borderRadius:28, padding:"40px 32px 32px", maxWidth:560, margin:"0 auto", textAlign:"center" }}>
+                <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:74, height:74, borderRadius:22, background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(249,115,22,.18))", border:"2px solid rgba(251,191,36,.4)", marginBottom:20, boxShadow:"0 0 40px rgba(251,191,36,.35)" }}>
+                  <AlertCircle style={{ width:38, height:38, color:"#fbbf24" }} />
+                </div>
+                <h2 style={{ fontSize:24, fontWeight:900, color:"#fff", margin:"0 0 10px" }}>Application Submitted!</h2>
+                <p style={{ color:"rgba(196,181,253,.75)", fontSize:14, margin:"0 0 18px", lineHeight:1.6 }}>
+                  Your sales-agent application is now <strong style={{ color:"#fbbf24" }}>pending admin approval</strong>. You will be able to log in and access your agent dashboard once an admin verifies your payment and approves your account.
+                </p>
+
+                {user?.referralCode && (
+                  <div style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"8px 16px", borderRadius:99, background:"rgba(251,191,36,.1)", border:"1px solid rgba(251,191,36,.3)", marginBottom:22 }}>
+                    <span style={{ color:"rgba(251,191,36,.7)", fontSize:11, fontWeight:700, letterSpacing:".06em", textTransform:"uppercase" }}>Your Agent ID:</span>
+                    <span style={{ color:"#fbbf24", fontWeight:900, fontSize:14, fontFamily:"monospace" }}>{user.referralCode}</span>
+                  </div>
+                )}
+
+                <div style={{ background:"rgba(37,211,102,.08)", border:"1px solid rgba(37,211,102,.3)", borderRadius:16, padding:"18px 18px 20px", marginBottom:18 }}>
+                  <p style={{ color:"rgba(220,255,235,.9)", fontSize:13, margin:"0 0 12px", lineHeight:1.55 }}>
+                    {whatsappNote}
+                  </p>
+                  <div style={{ background:"rgba(0,0,0,.25)", borderRadius:10, padding:"10px 12px", marginBottom:14, fontSize:12, color:"rgba(196,181,253,.8)", textAlign:"left", lineHeight:1.65 }}>
+                    <div><span style={{ color:"rgba(167,139,250,.7)" }}>Agent ID:</span> <strong style={{ color:"#fbbf24" }}>{user?.referralCode || "—"}</strong></div>
+                    <div><span style={{ color:"rgba(167,139,250,.7)" }}>Phone:</span> <strong style={{ color:"#fff" }}>{user?.phone || "—"}</strong></div>
+                    <div><span style={{ color:"rgba(167,139,250,.7)" }}>Txn ID:</span> <strong style={{ color:"#fff" }}>{txnId || user?.agentPaymentTxnId || "—"}</strong></div>
+                  </div>
+                  {whatsapp ? (
+                    <a
+                      href={buildWhatsappLink()}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display:"inline-flex", alignItems:"center", gap:8, padding:"12px 22px", borderRadius:99, background:"linear-gradient(135deg,#25d366,#128c7e)", color:"#fff", fontWeight:800, fontSize:14.5, textDecoration:"none", boxShadow:"0 8px 24px rgba(37,211,102,.5)" }}
+                    >
+                      <MessageCircle style={{ width:18, height:18 }} />
+                      Send Screenshot on WhatsApp: {whatsapp}
+                    </a>
+                  ) : (
+                    <p style={{ color:"rgba(167,139,250,.5)", fontSize:12, margin:0, fontStyle:"italic" }}>
+                      WhatsApp number not configured yet — contact admin.
+                    </p>
+                  )}
+                </div>
+
+                <div style={{ display:"flex", gap:10, justifyContent:"center", flexWrap:"wrap" }}>
+                  <Link to="/" className="auth-link3" style={{ fontSize:13, padding:"10px 20px", borderRadius:12, background:"rgba(167,139,250,.12)", border:"1px solid rgba(167,139,250,.3)", color:"#c4b5fd" }}>
+                    Back to Home
+                  </Link>
+                  <button onClick={async () => { await refreshUser(); if (user?.isAgent) navigate('/agent'); else toast('Still pending — please wait for admin approval', { icon: '⏳' }); }} style={{ fontSize:13, padding:"10px 20px", borderRadius:12, background:"rgba(251,191,36,.12)", border:"1px solid rgba(251,191,36,.35)", color:"#fbbf24", fontWeight:700, cursor:"pointer" }}>
+                    Check Approval Status
+                  </button>
+                </div>
               </div>
             </div>
           )}

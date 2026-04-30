@@ -61,6 +61,19 @@ router.post('/login', async (req, res, next) => {
     if (!user || !(await user.matchPassword(password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
     }
+    // Block login while agent application is pending or rejected
+    if (user.agentApprovalStatus === 'pending') {
+      return res.status(403).json({
+        message: 'Your sales-agent application is pending admin approval. You will be able to log in once approved.',
+        approvalStatus: 'pending',
+      });
+    }
+    if (user.agentApprovalStatus === 'rejected') {
+      return res.status(403).json({
+        message: `Your sales-agent application was rejected${user.agentRejectionReason ? ': ' + user.agentRejectionReason : '.'} Please contact admin.`,
+        approvalStatus: 'rejected',
+      });
+    }
     res.json({ token: signToken(user._id), user: sanitize(user) });
   } catch (err) { next(err); }
 });

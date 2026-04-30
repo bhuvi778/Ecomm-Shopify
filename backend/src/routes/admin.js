@@ -76,6 +76,68 @@ router.post('/run-agent-cashbacks', protect, requireRole('admin'), async (_req, 
   } catch (err) { next(err); }
 });
 
+// GET /api/admin/agents/pending — pending agent applications
+router.get('/agents/pending', protect, requireRole('admin'), async (_req, res, next) => {
+  try {
+    const users = await User.find({ agentApprovalStatus: 'pending' })
+      .select('-password')
+      .sort({ agentRegisteredAt: -1 });
+    res.json(users);
+  } catch (err) { next(err); }
+});
+
+// PUT /api/admin/agents/:id/approve — approve an agent application
+router.put('/agents/:id/approve', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.agentApprovalStatus !== 'pending') {
+      return res.status(400).json({ message: 'No pending application for this user' });
+    }
+    user.isAgent = true;
+    user.role = 'agent';
+    user.agentApprovalStatus = 'approved';
+    user.agentApprovedAt = new Date();
+    user.agentApprovedBy = req.user._id;
+    user.agentRejectionReason = null;
+    user.welcomeVoucher = { amount: 1000, used: user.welcomeVoucher?.used || 0 };
+    user.walletPoints = (user.walletPoints || 0) + 1000;
+    await user.save();
+
+    await Transaction.create({
+      user: user._id,
+      type: 'registration_fee',
+      points: -999,
+      description: 'Sales agent registration fee ₹999 (approved)',
+    });
+    await Transaction.create({
+      user: user._id,
+      type: 'voucher_credit',
+      points: 1000,
+      description: 'Agent welcome voucher ₹1000',
+    });
+
+    res.json({ message: 'Agent approved and activated', user });
+  } catch (err) { next(err); }
+});
+
+// PUT /api/admin/agents/:id/reject — reject an agent application
+router.put('/agents/:id/reject', protect, requireRole('admin'), async (req, res, next) => {
+  try {
+    const { reason } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: 'User not found' });
+    if (user.agentApprovalStatus !== 'pending') {
+      return res.status(400).json({ message: 'No pending application for this user' });
+    }
+    user.agentApprovalStatus = 'rejected';
+    user.agentRejectionReason = (reason || '').trim() || 'Application rejected';
+    user.isAgent = false;
+    await user.save();
+    res.json({ message: 'Agent application rejected', user });
+  } catch (err) { next(err); }
+});
+
 // GET /api/admin/payment-qr — any logged-in user (needed during agent registration)
 router.get('/payment-qr', protect, async (_req, res, next) => {
   try {

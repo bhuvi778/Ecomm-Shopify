@@ -7,11 +7,14 @@ import { addAgentToPool, getPoolTree } from '../services/poolService.js';
 
 const router = express.Router();
 
-// POST /api/agent/register - Register as sales agent (₹999)
+// POST /api/agent/register - Submit sales agent application (₹999 + GST). Awaits admin approval.
 router.post('/register', protect, async (req, res, next) => {
   try {
     if (req.user.isAgent) {
-      return res.status(400).json({ message: 'Already registered as agent' });
+      return res.status(400).json({ message: 'Already an active agent' });
+    }
+    if (req.user.agentApprovalStatus === 'pending') {
+      return res.status(400).json({ message: 'Your agent application is already pending admin approval' });
     }
     const { txnId } = req.body;
     if (!txnId || txnId.trim().length < 4) {
@@ -20,37 +23,26 @@ router.post('/register', protect, async (req, res, next) => {
     const user = await User.findByIdAndUpdate(
       req.user._id,
       {
-        isAgent: true,
-        role: 'agent',
         agentRegisteredAt: new Date(),
         agentFee: 999,
         agentPaymentTxnId: txnId.trim(),
-        agentCashbackMonths: 40, // pre-launch offer = 40 months × Rs.100 = Rs.4,000
+        agentCashbackMonths: 40,
         agentCashbackPaid: 0,
-        $inc: { walletPoints: 1000 }, // welcome voucher for agent
-        'welcomeVoucher.amount': 1000,
-        'welcomeVoucher.used': 0,
+        agentApprovalStatus: 'pending',
+        agentRejectionReason: null,
       },
       { new: true }
     );
 
-    // Fee transaction
+    // Record submitted fee transaction (informational; not yet credited)
     await Transaction.create({
       user: user._id,
       type: 'registration_fee',
-      points: -999,
-      description: 'Sales agent registration fee ₹999',
+      points: 0,
+      description: `Sales agent application submitted — txn ${txnId.trim()} — pending approval`,
     });
 
-    // Voucher credit
-    await Transaction.create({
-      user: user._id,
-      type: 'voucher_credit',
-      points: 1000,
-      description: 'Agent welcome voucher ₹1000',
-    });
-
-    res.json({ message: 'Registered as sales agent', user });
+    res.json({ message: 'Application submitted. Awaiting admin approval.', user });
   } catch (err) { next(err); }
 });
 
