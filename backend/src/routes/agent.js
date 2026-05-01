@@ -10,6 +10,9 @@ const router = express.Router();
 // POST /api/agent/register - Submit sales agent application (₹999 + GST). Awaits admin approval.
 router.post('/register', protect, async (req, res, next) => {
   try {
+    if (req.user.role === 'admin') {
+      return res.status(403).json({ message: 'Admin accounts cannot register as agents' });
+    }
     if (req.user.isAgent) {
       return res.status(400).json({ message: 'Already an active agent' });
     }
@@ -42,7 +45,8 @@ router.post('/register', protect, async (req, res, next) => {
       description: `Sales agent application submitted — txn ${txnId.trim()} — pending approval`,
     });
 
-    res.json({ message: 'Application submitted. Awaiting admin approval.', user });
+    const { password: _pw, ...safeUser } = user.toObject();
+    res.json({ message: 'Application submitted. Awaiting admin approval.', user: safeUser });
   } catch (err) { next(err); }
 });
 
