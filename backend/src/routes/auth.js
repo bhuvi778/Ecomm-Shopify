@@ -1,9 +1,19 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import { nanoid } from 'nanoid';
 import User from '../models/User.js';
 import Transaction from '../models/Transaction.js';
+import Settings from '../models/Settings.js';
 import { protect } from '../middleware/auth.js';
+
+// Atomically increment a counter so IDs start at 12125
+async function nextReferralCode() {
+  const doc = await Settings.findOneAndUpdate(
+    { key: 'referralCounter' },
+    [{ $set: { value: { $add: [{ $max: [{ $ifNull: ['$value', 12124] }, 12124] }, 1] } } }],
+    { upsert: true, new: true }
+  );
+  return String(doc.value);
+}
 
 const router = express.Router();
 
@@ -31,7 +41,7 @@ router.post('/register', async (req, res, next) => {
       email,
       phone,
       password,
-      referralCode: nanoid(8).toUpperCase(),
+      referralCode: await nextReferralCode(),
       referredBy: referrer?._id || null,
       // ₹1000 welcome voucher
       welcomeVoucher: { amount: 1000, used: 0 },
