@@ -589,7 +589,7 @@ export default function Home() {
         .mob-cat-overlay.open { display:block; }
         .mob-sidebar-close { display:none; }
         @media (max-width:767px) {
-          .home-sidebar { position:fixed !important; left:-100% !important; top:0; height:100vh !important; height:100dvh !important; width:82vw !important; max-width:300px !important; min-width:0 !important; z-index:301; transition:left .28s cubic-bezier(.4,0,.2,1); }
+          .home-sidebar { position:fixed !important; left:-100% !important; top:0; height:100vh !important; height:100dvh !important; width:82vw !important; max-width:280px !important; min-width:0 !important; z-index:301; transition:left .28s cubic-bezier(.4,0,.2,1); }
           .home-sidebar.mob-open { left:0 !important; box-shadow:6px 0 48px rgba(0,0,0,.9); }
           .home-hero-section { overflow-y:auto !important; overflow-x:hidden !important; }
           .hero-content-z { height:auto !important; min-height:100svh !important; justify-content:flex-start !important; padding-top:70px !important; padding-left:20px !important; padding-right:20px !important; padding-bottom:64px !important; }
@@ -613,7 +613,7 @@ export default function Home() {
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
 
-      <div className="flex w-full overflow-hidden" style={{ height:"100svh", minHeight:"-webkit-fill-available" }}>
+      <div className="flex w-full" style={{ height:"100svh", minHeight:"-webkit-fill-available", overflowX:"hidden", overflowY:"hidden" }}>
 
         {/* ══════════════════════════════════════════════
             LEFT — CATEGORY SIDEBAR
@@ -621,7 +621,7 @@ export default function Home() {
         <aside
           ref={asideRef}
           className={`sidebar-bg flex flex-col h-full z-10 shadow-2xl home-sidebar${mobileCatOpen ? " mob-open" : ""}`}
-          style={{ width:"28%", minWidth:240, maxWidth:380 }}
+          style={{ width:"300px", flexShrink:0 }}
         >
           {/* Mobile close button */}
           <div className="mob-sidebar-close" style={{ justifyContent:'flex-end', padding:'10px 12px 0', flexShrink:0 }}>
@@ -779,7 +779,7 @@ export default function Home() {
         {/* ══════════════════════════════════════════════
             RIGHT — PRE-LAUNCH HERO
         ══════════════════════════════════════════════ */}
-        <section ref={heroRef} className="flex-1 h-full relative overflow-hidden hero-bg home-hero-section">
+        <section ref={heroRef} className="h-full relative overflow-hidden hero-bg home-hero-section" style={{ flex:"1 1 0", minWidth:0 }}>
 
           {/* Animated grid */}
           <div className="hero-grid absolute inset-0 pointer-events-none z-0" />
