@@ -12,6 +12,7 @@ import Cart from './pages/Cart.jsx';
 import Checkout from './pages/Checkout.jsx';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+import Signup from './pages/Signup.jsx';
 import Dashboard from './pages/Dashboard.jsx';
 import AgentDashboard from './pages/AgentDashboard.jsx';
 import AgentRegister from './pages/AgentRegister.jsx';
@@ -25,7 +26,7 @@ export default function App() {
   const location = useLocation();
   const { pathname } = location;
   const hideShell =
-    ['/', '/login', '/register', '/agent/register'].includes(pathname) ||
+    ['/', '/login', '/register', '/signup', '/agent/register'].includes(pathname) ||
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/admin') ||
     pathname.startsWith('/agent');
@@ -43,6 +44,7 @@ export default function App() {
           <Route path="/cart" element={<Cart />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/agent/register" element={<AgentRegister />} />
 
           <Route element={<ProtectedRoute />}>

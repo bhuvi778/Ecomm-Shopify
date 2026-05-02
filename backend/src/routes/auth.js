@@ -98,6 +98,19 @@ router.put('/address', protect, async (req, res, next) => {
   } catch (err) { next(err); }
 });
 
+// GET /api/auth/referrer?code=XXXXX  — public: returns agent name for referral banner
+router.get('/referrer', async (req, res) => {
+  try {
+    const { code } = req.query;
+    if (!code) return res.status(400).json({ message: 'code required' });
+    const user = await User.findOne({ referralCode: code.toUpperCase() }).select('name isAgent role');
+    if (!user) return res.status(404).json({ message: 'Referral code not found' });
+    res.json({ name: user.name, isAgent: user.isAgent, role: user.role });
+  } catch (err) {
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 function sanitize(user) {
   const u = user.toObject ? user.toObject() : user;
   delete u.password;
