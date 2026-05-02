@@ -516,15 +516,15 @@ export default function Home() {
           backdrop-filter: blur(14px);
           box-shadow: 0 4px 26px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.06);
           transition: transform .22s ease;
-          min-width: 60px;
+          min-width: 48px;
         }
         .countdown-box:hover { transform: translateY(-3px); }
         .countdown-colon {
-          font-size: 1.5rem;
+          font-size: 1.1rem;
           font-weight: 900;
           color: rgba(255,255,255,.22);
           line-height: 1;
-          margin-bottom: 12px;
+          margin-bottom: 6px;
         }
 
         /* ── AURORA BLOBS ── */
@@ -597,15 +597,15 @@ export default function Home() {
           .home-hero-section { overflow-y:auto !important; overflow-x:hidden !important; }
           .hero-content-z { height:auto !important; min-height:100svh !important; justify-content:flex-start !important; padding-top:70px !important; padding-left:20px !important; padding-right:20px !important; padding-bottom:64px !important; }
           .brand-flex-mob { gap:8px !important; }
-          .brand-font-mob { font-size:clamp(2.4rem,11vw,3.5rem) !important; }
+          .brand-font-mob { font-size:clamp(1.9rem,9vw,2.8rem) !important; }
           .mob-cat-btn { display:flex !important; }
           .mob-sidebar-close { display:flex !important; }
           .float-sticker { display:none !important; }
           .mob-hide-ribbon { display:none !important; }
           .pill-item { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
-          .stat-card { min-width:50px !important; }
-          .countdown-box { min-width:50px !important; padding:8px 6px !important; }
-          .countdown-colon { font-size:1.1rem !important; margin-bottom:8px !important; }
+          .stat-card { min-width:44px !important; }
+          .countdown-box { min-width:40px !important; padding:5px 4px !important; }
+          .countdown-colon { font-size:.9rem !important; margin-bottom:4px !important; }
         }
       `}</style>
 
@@ -908,10 +908,10 @@ export default function Home() {
           </motion.div>
 
           {/* ── MAIN CONTENT ── */}
-          <div className="hero-content-z h-full flex flex-col items-center justify-center px-8 lg:px-14 text-center pb-10">
+          <div className="hero-content-z h-full flex flex-col items-center justify-center px-6 lg:px-10 text-center pb-6" style={{overflowY:"auto"}}>
 
             {/* Badge */}
-            <div ref={badgeRef} className="mb-4 hero-anim">
+            <div ref={badgeRef} className="mb-2 hero-anim">
               <div className="relative inline-block">
                 <span className="badge-shine inline-flex items-center gap-2 text-white text-[10px] font-black px-6 py-2.5 rounded-full uppercase tracking-[0.22em] relative overflow-hidden">
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
@@ -923,37 +923,37 @@ export default function Home() {
             </div>
 
             {/* Brand */}
-            <div ref={brandRef} style={{ gap:20 }} className="mb-3 flex items-baseline brand-flex-mob hero-anim">
+            <div ref={brandRef} style={{ gap:16 }} className="mb-2 flex items-baseline brand-flex-mob hero-anim">
               <span className="brand-gmt font-black leading-none brand-font-mob"
-                style={{ fontSize:"clamp(3.5rem,8.5vw,6.2rem)", letterSpacing:"-0.03em" }}>
+                style={{ fontSize:"clamp(2.4rem,5vw,4.2rem)", letterSpacing:"-0.03em" }}>
                 GMT
               </span>
               <span className="brand-mart font-black leading-none brand-font-mob"
-                style={{ fontSize:"clamp(3.5rem,8.5vw,6.2rem)", letterSpacing:"-0.03em" }}>
+                style={{ fontSize:"clamp(2.4rem,5vw,4.2rem)", letterSpacing:"-0.03em" }}>
                 MART
               </span>
             </div>
 
             {/* Tagline */}
-            <p ref={tagRef} style={{ color:"rgba(196,181,253,.72)", letterSpacing:"0.22em" }}
-              className="text-[11px] font-bold uppercase mb-2 hero-anim">
+            <p ref={tagRef} style={{ color:"rgba(196,181,253,.72)", letterSpacing:"0.18em" }}
+              className="text-[10px] font-bold uppercase mb-1 hero-anim">
               {TAGLINE}
             </p>
 
             {/* Divider */}
-            <div ref={divRef} className="origin-center flex items-center gap-3 mb-5">
+            <div ref={divRef} className="origin-center flex items-center gap-3 mb-3">
               <div style={{ width:60, height:1, background:"linear-gradient(90deg,transparent,rgba(167,139,250,.7))" }} />
               <div style={{ width:8, height:8, borderRadius:"50%", background:"#fbbf24", boxShadow:"0 0 14px #fbbf24, 0 0 28px rgba(251,191,36,.5)" }} />
               <div style={{ width:60, height:1, background:"linear-gradient(90deg,rgba(167,139,250,.7),transparent)" }} />
             </div>
 
             {/* Countdown Timer */}
-            <div className="mb-6 flex flex-col items-center gap-2.5">
-              <p className="text-white/30 text-[9px] font-bold uppercase tracking-[0.22em] flex items-center gap-1.5">
+            <div className="mb-3 flex flex-col items-center gap-1.5">
+              <p className="text-white/30 text-[9px] font-bold uppercase tracking-[0.18em] flex items-center gap-1.5">
                 <Timer className="w-3 h-3 text-yellow-400/60" />
                 Official Launch In
               </p>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5">
                 {[
                   { value: time.d, label: "Days",  color: "#fbbf24" },
                   { value: time.h, label: "Hours", color: "#a78bfa" },
@@ -961,11 +961,11 @@ export default function Home() {
                   { value: time.s, label: "Secs",  color: "#f87171" },
                 ].map(({ value, label, color }, idx) => (
                   <React.Fragment key={label}>
-                    <div className="countdown-box flex flex-col items-center justify-center rounded-xl px-3 py-2">
+                    <div className="countdown-box flex flex-col items-center justify-center rounded-xl px-2 py-1.5">
                       <span style={{
-                        fontSize:"1.55rem", fontWeight:900, color,
+                        fontSize:"1.15rem", fontWeight:900, color,
                         letterSpacing:"-0.03em", lineHeight:1,
-                        textShadow:`0 0 18px ${color}cc, 0 0 38px ${color}66`
+                        textShadow:`0 0 14px ${color}cc, 0 0 28px ${color}66`
                       }}>
                         {String(value).padStart(2, "0")}
                       </span>
@@ -981,7 +981,7 @@ export default function Home() {
 
             {/* Headline */}
             <h2 ref={subhRef}
-              className="text-[1.65rem] lg:text-[2rem] font-black text-white mb-3 leading-tight hero-anim">
+              className="text-[1.3rem] lg:text-[1.6rem] font-black text-white mb-2 leading-tight hero-anim">
               Shop Smart.{" "}
               <span style={{
                 background:"linear-gradient(90deg, #a78bfa, #c084fc, #e879f9)",
@@ -1000,7 +1000,7 @@ export default function Home() {
             </h2>
 
             <p ref={descRef} style={{ color:"rgba(200,195,230,.78)" }}
-              className="text-[13px] max-w-[360px] mb-6 leading-relaxed hero-anim">
+              className="text-[12px] max-w-[360px] mb-3 leading-relaxed hero-anim">
               India's first marketplace with{" "}
               <strong style={{ color:"#c4b5fd", fontWeight:700 }}>100% value returned as rewards over time</strong>
               {" — "}
@@ -1009,7 +1009,7 @@ export default function Home() {
             </p>
 
             {/* Pills */}
-            <div className="flex flex-wrap justify-center gap-2 max-w-[440px] mb-6">
+            <div className="flex flex-wrap justify-center gap-2 max-w-[440px] mb-3">
               {[
                 { icon:"🎁", text:"Rs.1000 Welcome Voucher", ac:"#fbbf24" },
                 { icon:"💰", text:"Up to 100% Value Returned", ac:"#34d399" },
@@ -1049,7 +1049,7 @@ export default function Home() {
             </div>
 
             {/* Sign in */}
-            <div className="mt-4 flex items-center gap-2">
+            <div className="mt-2 flex items-center gap-2">
               <span className="text-[11px] font-medium" style={{ color:"rgba(220,210,255,.75)" }}>Already a member?</span>
               <Link to="/login"
                 className="inline-flex items-center gap-1 text-[11px] font-bold px-3 py-1 rounded-full transition-all duration-200"
@@ -1064,7 +1064,7 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div className="mt-5 grid grid-cols-4 gap-2 w-full max-w-[380px]">
+            <div className="mt-3 grid grid-cols-4 gap-2 w-full max-w-[380px]">
               {[
                 { num:"2.5L+", label:"Products",   color:"#fbbf24", icon:"📦", from:"rgba(251,191,36,.14)", bdr:"#fbbf2455" },
                 { num:"16+",   label:"Categories", color:"#a78bfa", icon:"🗂️", from:"rgba(167,139,250,.14)", bdr:"#a78bfa55" },
@@ -1078,8 +1078,8 @@ export default function Home() {
                     backdropFilter:"blur(18px)",
                     boxShadow:`0 4px 18px ${color}18, inset 0 1px 0 rgba(255,255,255,.07)`,
                   }}>
-                  <span className="text-[18px] leading-none mb-1">{icon}</span>
-                  <div className="font-black text-[1.1rem] leading-none"
+                  <span className="text-[15px] leading-none mb-0.5">{icon}</span>
+                  <div className="font-black text-[.9rem] leading-none"
                     style={{ color, textShadow:`0 0 14px ${color}bb, 0 0 28px ${color}55` }}>
                     {num}
                   </div>
