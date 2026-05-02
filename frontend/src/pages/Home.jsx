@@ -432,7 +432,7 @@ export default function Home() {
           0%,100% { opacity:.8; }
           50%      { opacity:1;  }
         }
-        .pill-item { animation: pillGlow 3s ease-in-out infinite; }
+        .pill-item { opacity: 0; animation: pillGlow 3s ease-in-out infinite; }
 
         /* 3-D canvas vignette */
         .canvas-vignette {
@@ -462,6 +462,8 @@ export default function Home() {
 
         /* Ensure hero z20 for content */
         .hero-content-z { position:relative; z-index:20; }
+        /* Initial hidden state for GSAP-animated hero elements — prevents React re-renders from resetting inline opacity:0 */
+        .hero-anim { opacity: 0; }
 
         /* ── GRADIENT BRAND TEXT ── */
         .brand-gmt {
@@ -543,6 +545,7 @@ export default function Home() {
           transition: transform .25s ease, box-shadow .25s ease;
           box-shadow: 0 4px 18px rgba(0,0,0,.45);
           min-width: 70px;
+          opacity: 0;
         }
 
         /* ── MOBILE — kill every backdrop-filter and animation that uses GPU layers ── */
@@ -908,7 +911,7 @@ export default function Home() {
           <div className="hero-content-z h-full flex flex-col items-center justify-center px-8 lg:px-14 text-center pb-10">
 
             {/* Badge */}
-            <div ref={badgeRef} style={{ opacity:0 }} className="mb-4">
+            <div ref={badgeRef} className="mb-4 hero-anim">
               <div className="relative inline-block">
                 <span className="badge-shine inline-flex items-center gap-2 text-white text-[10px] font-black px-6 py-2.5 rounded-full uppercase tracking-[0.22em] relative overflow-hidden">
                   <Sparkles className="w-3.5 h-3.5 text-yellow-300" />
@@ -920,7 +923,7 @@ export default function Home() {
             </div>
 
             {/* Brand */}
-            <div ref={brandRef} style={{ opacity:0, gap:20 }} className="mb-3 flex items-baseline brand-flex-mob">
+            <div ref={brandRef} style={{ gap:20 }} className="mb-3 flex items-baseline brand-flex-mob hero-anim">
               <span className="brand-gmt font-black leading-none brand-font-mob"
                 style={{ fontSize:"clamp(3.5rem,8.5vw,6.2rem)", letterSpacing:"-0.03em" }}>
                 GMT
@@ -932,8 +935,8 @@ export default function Home() {
             </div>
 
             {/* Tagline */}
-            <p ref={tagRef} style={{ opacity:0, color:"rgba(196,181,253,.72)", letterSpacing:"0.22em" }}
-              className="text-[11px] font-bold uppercase mb-2">
+            <p ref={tagRef} style={{ color:"rgba(196,181,253,.72)", letterSpacing:"0.22em" }}
+              className="text-[11px] font-bold uppercase mb-2 hero-anim">
               {TAGLINE}
             </p>
 
@@ -977,8 +980,8 @@ export default function Home() {
             </div>
 
             {/* Headline */}
-            <h2 ref={subhRef} style={{ opacity:0 }}
-              className="text-[1.65rem] lg:text-[2rem] font-black text-white mb-3 leading-tight">
+            <h2 ref={subhRef}
+              className="text-[1.65rem] lg:text-[2rem] font-black text-white mb-3 leading-tight hero-anim">
               Shop Smart.{" "}
               <span style={{
                 background:"linear-gradient(90deg, #a78bfa, #c084fc, #e879f9)",
@@ -996,8 +999,8 @@ export default function Home() {
               }}>Live Better.</span>
             </h2>
 
-            <p ref={descRef} style={{ opacity:0, color:"rgba(200,195,230,.78)" }}
-              className="text-[13px] max-w-[360px] mb-6 leading-relaxed">
+            <p ref={descRef} style={{ color:"rgba(200,195,230,.78)" }}
+              className="text-[13px] max-w-[360px] mb-6 leading-relaxed hero-anim">
               India's first marketplace with{" "}
               <strong style={{ color:"#c4b5fd", fontWeight:700 }}>100% value returned as rewards over time</strong>
               {" — "}
@@ -1014,7 +1017,6 @@ export default function Home() {
               ].map((p,i)=>(
                 <div key={i} className="pill-item inline-flex items-center gap-1.5 text-[11.5px] font-bold px-3.5 py-1.5 rounded-full cursor-default"
                   style={{
-                    opacity:0,
                     color:p.ac,
                     background:`${p.ac}14`,
                     border:`1px solid ${p.ac}45`,
@@ -1029,8 +1031,8 @@ export default function Home() {
             </div>
 
             {/* Buttons */}
-            <div ref={btnRef} style={{ opacity:0 }}
-              className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-[380px]">
+            <div ref={btnRef}
+              className="flex flex-col sm:flex-row items-center gap-3 w-full max-w-[380px] hero-anim">
               <Card3D className="w-full">
                 <Link to="/agent/register"
                   className="btn-agent w-full flex items-center justify-center gap-2 py-4 px-5 rounded-2xl font-black text-sm hover:brightness-110 transition-all duration-200 group"
@@ -1071,7 +1073,6 @@ export default function Home() {
               ].map(({ num, label, color, icon, from, bdr })=>(
                 <div key={label} className="stat-card stat-item rounded-2xl px-2 py-3 text-center flex flex-col items-center"
                   style={{
-                    opacity:0,
                     background:from,
                     border:`1px solid ${bdr}`,
                     backdropFilter:"blur(18px)",
