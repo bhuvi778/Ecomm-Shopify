@@ -8,7 +8,7 @@ import { gsap } from "gsap";
 
 const BENEFITS = [
   { icon:Gift,              label:"Welcome Voucher",   value:"Rs.1000",       desc:"Credited on joining",                                   color:"#fbbf24", bg:"rgba(251,191,36,.12)",  border:"rgba(251,191,36,.3)"  },
-  { icon:TrendingUp,        label:"Monthly Reward",    value:"Rs.100 × 40 mo", desc:"Total Rs.4,000 — offer only till pre-launching period", color:"#34d399", bg:"rgba(52,211,153,.1)",   border:"rgba(52,211,153,.28)" },
+  { icon:TrendingUp,        label:"Monthly Reward",    value:"Rs.100 × 40 mo", desc:"Total Rs.4,000 cashback over 40 months",                color:"#34d399", bg:"rgba(52,211,153,.1)",   border:"rgba(52,211,153,.28)" },
   { icon:Users,             label:"Referral Income",   value:"Multi-level",   desc:"Earn on every referral purchase",                       color:"#a78bfa", bg:"rgba(167,139,250,.1)",  border:"rgba(167,139,250,.28)"},
   { icon:Star,              label:"Global Pool Entry", value:"Exclusive",     desc:"Participate in pool matrix rewards",                    color:"#f472b6", bg:"rgba(244,114,182,.1)",  border:"rgba(244,114,182,.28)"},
   { icon:CheckCircle,       label:"Sales Training",    value:"Free",          desc:"2 weeks worth Rs.25,000 — included",                    color:"#22d3ee", bg:"rgba(34,211,238,.1)",   border:"rgba(34,211,238,.28)" },
@@ -50,20 +50,15 @@ export default function AgentRegister() {
         setStep(4);
       })();
     }
-    gsap.fromTo(heroRef.current,
-      { y: -30, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.7, ease: "expo.out" }
-    );
-    gsap.fromTo(cardRef.current,
-      { y: 60, opacity: 0, scale: 0.97 },
-      { y: 0, opacity: 1, scale: 1, duration: 0.75, ease: "expo.out", delay: 0.1 }
-    );
+    // Set initial state via GSAP (not inline JSX opacity:0 which React resets on re-render)
+    gsap.set(heroRef.current, { opacity: 0, y: -30 });
+    gsap.set(cardRef.current, { opacity: 0, y: 60, scale: 0.97 });
+    gsap.to(heroRef.current,  { opacity: 1, y: 0, duration: 0.7, ease: "expo.out" });
+    gsap.to(cardRef.current,  { opacity: 1, y: 0, scale: 1, duration: 0.75, ease: "expo.out", delay: 0.1 });
     gsap.fromTo(".benefit-card",
       { x: -30, opacity: 0 },
       { x: 0, opacity: 1, stagger: 0.08, duration: 0.45, ease: "power3.out", delay: 0.3 }
     );
-    // mark card as visible so returning to step1 works
-    if (cardRef.current) cardRef.current.style.opacity = "";
   }, []);
 
   const animateStep1 = () => {
@@ -212,6 +207,8 @@ export default function AgentRegister() {
           .agent-bg { padding-left:12px !important; padding-right:12px !important; }
           .agent-glass { backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
         }
+        @keyframes stepFadeIn { from { opacity:0; transform:translateY(40px) scale(0.97); } to { opacity:1; transform:translateY(0) scale(1); } }
+        .step-enter { animation: stepFadeIn 0.6s cubic-bezier(0.16,1,0.3,1) both; }
       `}</style>
       <div className="agent-bg">
         <div className="agent-grid" />
@@ -228,7 +225,7 @@ export default function AgentRegister() {
         <div style={{ maxWidth: step===2 ? 560 : 900, margin:"0 auto", position:"relative", zIndex:10 }}>
 
           {/* Hero header */}
-          <div ref={heroRef} style={{ textAlign:"center", marginBottom:36, opacity:0 }}>
+          <div ref={heroRef} style={{ textAlign:"center", marginBottom:36 }}>
             <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:66, height:66, borderRadius:20, background:"linear-gradient(135deg,#fde68a,#fbbf24,#f97316)", boxShadow:"0 0 36px rgba(251,191,36,.65)", marginBottom:18 }}>
               <Crown style={{ width:32, height:32, color:"#1a0a00" }} />
             </div>
@@ -242,7 +239,7 @@ export default function AgentRegister() {
 
           {/* ── STEP 1: Benefits & Pricing ── */}
           {step === 1 && (
-            <div ref={cardRef} className="ar-step1-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24, opacity:0 }}>
+            <div ref={cardRef} className="ar-step1-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:24 }}>
 
               {/* Benefits grid */}
               <div>
@@ -273,7 +270,7 @@ export default function AgentRegister() {
                   <div style={{ fontSize:14, color:"rgba(167,139,250,.6)", letterSpacing:"0.08em", textTransform:"uppercase", fontWeight:600, marginBottom:4 }}>One Time Registration Fees</div>
                   <div style={{ fontSize:42, fontWeight:900, color:"#fff", lineHeight:1.05, marginBottom:4, textShadow:"0 0 28px rgba(255,255,255,.2)" }}>Rs.999<span style={{ fontSize:18, color:"#fbbf24", marginLeft:6 }}>+ 18% GST</span></div>
                   <div style={{ fontSize:12, color:"rgba(196,181,253,.55)", marginBottom:8 }}>Includes 2-week training worth Rs.25,000</div>
-                  <div style={{ fontSize:11, color:"#34d399", fontWeight:700, marginBottom:18, padding:"4px 10px", background:"rgba(52,211,153,.08)", border:"1px solid rgba(52,211,153,.22)", borderRadius:99, display:"inline-block" }}>Offer only till pre-launching period</div>
+
                   {[
                     { label:"Registration Fees",                                  val:"Rs.999 + 18% GST", c:"rgba(200,195,230,.7)" },
                     { label:"Welcome Voucher",                                    val:"Rs.1,000",         c:"#fbbf24" },
@@ -286,7 +283,7 @@ export default function AgentRegister() {
                   ))}
                   <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", padding:"10px 0 0", fontSize:14 }}>
                     <span style={{ color:"rgba(196,181,253,.8)", fontWeight:700 }}>Net Earning</span>
-                    <span style={{ color:"#34d399", fontWeight:900, fontSize:16, textShadow:"0 0 16px rgba(52,211,153,.6)" }}>Rs.4,000</span>
+                    <span style={{ color:'#34d399', fontWeight:900, fontSize:16, textShadow:"0 0 16px rgba(52,211,153,.6)" }}>Rs.5,000</span>
                   </div>
                 </div>
 
@@ -314,7 +311,7 @@ export default function AgentRegister() {
 
           {/* ── STEP 2: Registration Form ── */}
           {step === 2 && (
-            <div ref={step2Ref} style={{ opacity:0 }}>
+            <div ref={step2Ref} className="step-enter" key="step2">
               <div className="agent-glass" style={{ borderRadius:28, padding:"36px 32px 32px", maxWidth:520, margin:"0 auto" }}>
 
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28 }}>
@@ -397,7 +394,7 @@ export default function AgentRegister() {
 
           {/* ── STEP 3: QR Payment ── */}
           {step === 3 && (
-            <div ref={step2Ref} style={{ opacity:0 }}>
+            <div ref={step2Ref} className="step-enter" key="step3">
               <div className="agent-glass" style={{ borderRadius:28, padding:"36px 32px 32px", maxWidth:520, margin:"0 auto" }}>
 
                 <div style={{ display:"flex", alignItems:"center", gap:10, marginBottom:28 }}>
@@ -497,7 +494,7 @@ export default function AgentRegister() {
 
           {/* ── STEP 4: Pending Approval ── */}
           {step === 4 && (
-            <div ref={step2Ref} style={{ opacity:0 }}>
+            <div ref={step2Ref} className="step-enter" key="step4">
               <div className="agent-glass" style={{ borderRadius:28, padding:"40px 32px 32px", maxWidth:560, margin:"0 auto", textAlign:"center" }}>
                 <div style={{ display:"inline-flex", alignItems:"center", justifyContent:"center", width:74, height:74, borderRadius:22, background:"linear-gradient(135deg,rgba(251,191,36,.25),rgba(249,115,22,.18))", border:"2px solid rgba(251,191,36,.4)", marginBottom:20, boxShadow:"0 0 40px rgba(251,191,36,.35)" }}>
                   <AlertCircle style={{ width:38, height:38, color:"#fbbf24" }} />

@@ -621,7 +621,7 @@ export default function Home() {
         <aside
           ref={asideRef}
           className={`sidebar-bg flex flex-col h-full z-10 shadow-2xl home-sidebar${mobileCatOpen ? " mob-open" : ""}`}
-          style={{ width:"38%", minWidth:255, maxWidth:440 }}
+          style={{ width:"28%", minWidth:240, maxWidth:380 }}
         >
           {/* Mobile close button */}
           <div className="mob-sidebar-close" style={{ justifyContent:'flex-end', padding:'10px 12px 0', flexShrink:0 }}>
